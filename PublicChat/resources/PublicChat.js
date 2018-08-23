@@ -77,10 +77,11 @@ function sendText() {
                 }
             }
         });
+    $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
 }
 
 function inputKeyPress(event) {
-    if("Enter" === event.code && !event.shiftKey) {
+    if("Enter" === event.key && !event.shiftKey) {
         sendText();
     }
 }
