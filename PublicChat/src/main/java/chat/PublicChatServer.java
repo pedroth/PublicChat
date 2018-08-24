@@ -13,13 +13,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
 public class PublicChatServer {
     private final static String HOME_ADDRESS = "resources/";
-    private final static String DATA_ADDRESS = HOME_ADDRESS + "/data/";
+    private final static String DATA_ADDRESS = HOME_ADDRESS + "data/";
     // time in seconds
     private final static double TIMEOUT = 10;
     private static int BUFFER_SIZE = 2000000 * (1 << 10);
@@ -51,36 +52,36 @@ public class PublicChatServer {
     }
 
     void start() {
-        HttpServer httpServer;
-        stopWatch = new StopWatch();
+        this.stopWatch = new StopWatch();
 
         //check for dead clients
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                double dt = stopWatch.getEleapsedTime();
-                stopWatch.resetTime();
-                for (String id : uID2TimeMap.keySet()) {
-                    Double t = uID2TimeMap.get(id);
-                    if (t > TIMEOUT) {
-                        uID2TimeMap.remove(id);
-                    } else {
-                        uID2TimeMap.put(id, t + dt);
-                    }
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() ->
+        {
+            double dt = stopWatch.getEleapsedTime();
+            stopWatch.resetTime();
+            for (String id : uID2TimeMap.keySet()) {
+                Double t = uID2TimeMap.get(id);
+                if (t > TIMEOUT) {
+                    uID2TimeMap.remove(id);
+                } else {
+                    uID2TimeMap.put(id, t + dt);
                 }
             }
-        }, 0, 1000);
-
+        }, 0, 1000, TimeUnit.MILLISECONDS);
         try {
-            InetSocketAddress inetSocketAddress = new InetSocketAddress(serverPort);
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverPort);
             System.out.println("Start public chat server at : " + inetSocketAddress);
-            httpServer = HttpServer.create(inetSocketAddress, 0);
+
+            HttpServer httpServer = HttpServer.create(inetSocketAddress, 0);
+            createServices(httpServer);
+            httpServer.setExecutor(Executors.newCachedThreadPool());
+            httpServer.start();
         } catch (IOException e) {
             log.debug("Exception Caught:", e);
-            return;
         }
+    }
 
+    private void createServices(HttpServer httpServer) {
         httpServer.createContext("/PublicChat", httpExchange -> {
             try {
                 printClientData(httpExchange);
@@ -131,7 +132,7 @@ public class PublicChatServer {
                 }
                 String id = stringMap.get("id");
                 putClientInMap(id);
-                logList.add(new UnitLog(id, stringMap.get("log")));
+                this.logList.add(new UnitLog(id, stringMap.get("log")));
                 JServerUtils.respondWithText(httpExchange, "OK");
             } catch (Exception e) {
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
@@ -147,7 +148,7 @@ public class PublicChatServer {
                 for (Map.Entry<String, String> entry : stringMap.entrySet()) {
                     System.out.println(entry.getKey() + " : " + entry.getValue());
                 }
-                logList.removeAll(logList);
+                this.logList.removeAll(this.logList);
                 removeData();
                 JServerUtils.respondWithText(httpExchange, "OK");
             } catch (Exception e) {
@@ -164,9 +165,6 @@ public class PublicChatServer {
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
-
-        httpServer.setExecutor(Executors.newCachedThreadPool());
-        httpServer.start();
     }
 
     private void removeData() {
@@ -174,27 +172,18 @@ public class PublicChatServer {
     }
 
     private String uploadFile(HttpExchange he) throws IOException {
-        int c;
-        String fileName;
-        OutputStream outputStream = null;
+        int readByte;
         final InputStream requestBody = he.getRequestBody();
-        try {
-            byte[] buffer = new byte[BUFFER_SIZE];
-            SMUpload smUpload = new SMUpload(buffer);
-            while ((c = requestBody.read()) != -1) {
-                smUpload.next(c);
-            }
-            fileName = smUpload.getFileName();
-            assert fileName == null : new RuntimeException("No file name");
-            FilesCrawler.createDirs(DATA_ADDRESS);
-            outputStream = new FileOutputStream(DATA_ADDRESS + fileName);
+        byte[] buffer = new byte[BUFFER_SIZE];
+        SMUpload smUpload = new SMUpload(buffer);
+        while ((readByte = requestBody.read()) != -1) {
+            smUpload.next(readByte);
+        }
+        String fileName = smUpload.getFileName();
+        assert fileName == null : new RuntimeException("No file name");
+        FilesCrawler.createDirs(DATA_ADDRESS);
+        try (OutputStream outputStream = new FileOutputStream(DATA_ADDRESS + fileName)) {
             outputStream.write(buffer, 0, smUpload.getIndex());
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (outputStream != null) {
-                outputStream.close();
-            }
         }
         return fileName;
     }
@@ -203,21 +192,21 @@ public class PublicChatServer {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("{ \"users\": [");
-        String[] uids = uID2TimeMap.keySet().toArray(new String[uID2TimeMap.size()]);
+        String[] uids = this.uID2TimeMap.keySet().toArray(new String[this.uID2TimeMap.size()]);
         for (int i = 0; i < uids.length; i++) {
             stringBuilder.append("\"" + uids[i] + "\"" + ((i == uids.length - 1) ? "" : ","));
         }
 
         stringBuilder.append("],");
         stringBuilder.append("\"log\": [");
-        for (int i = index + 1; i < logList.size(); i++) {
-            UnitLog unitLog = logList.get(i);
-            stringBuilder.append("{\"id\": \"" + unitLog.getId() + "\", \"text\":\"" + unitLog.getText() + "\"}" + ((i == logList.size() - 1) ? "" : ","));
+        for (int i = index + 1; i < this.logList.size(); i++) {
+            UnitLog unitLog = this.logList.get(i);
+            stringBuilder.append("{\"id\": \"" + unitLog.getId() + "\", \"text\":\"" + unitLog.getText() + "\"}" + ((i == this.logList.size() - 1) ? "" : ","));
         }
 
         stringBuilder.append("],");
         stringBuilder.append("\"needClean\": ");
-        stringBuilder.append("" + (index >= logList.size()) + "");
+        stringBuilder.append("" + (index >= this.logList.size()) + "");
         stringBuilder.append("}");
 
         return stringBuilder.toString();
@@ -243,6 +232,6 @@ public class PublicChatServer {
     }
 
     private void putClientInMap(String id) {
-        uID2TimeMap.put(id, 0.0);
+        this.uID2TimeMap.put(id, 0.0);
     }
 }
