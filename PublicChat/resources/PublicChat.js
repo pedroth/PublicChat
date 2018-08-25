@@ -18,6 +18,8 @@ function htmlDecode(value){
 		  return $('<div/>').html(value).text();
 }
 
+
+
 function generateNotification(title, text) {
     var notification = new Notification(title, { body: text});
 }
@@ -66,9 +68,9 @@ function getChat() {
                     var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
                     var id = decodeURIComponent(chat.log[i].id);
                     if(pattern.test(text)) {
-                        $("#chat").append("<p>" + id + " > <a target='_blank' href='" + text +  "'>" + text + "</a></p>");
+                        $("#chat").append("<p>" + id + " > <a target='_blank' href='" + htmlEncode(text) +  "'>" + text + "</a></p>");
                     } else {
-                        $("#chat").append("<p>" + id + " > " + text + "</p>");
+                        $("#chat").append("<p>" + id + " > " + htmlEncode(text) + "</p>");
                     }
                     if(id !== uID) {
                         generateNotification("PublicChat", id + " > " + text);
