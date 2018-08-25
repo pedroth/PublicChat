@@ -52,6 +52,14 @@ body {
     padding-top: 60px;
 }
 
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
 .sidenav * {
     text-decoration: none;
     display: block;
@@ -59,7 +67,7 @@ body {
 }
 
 .sidenav a:hover {
-    color: #f1f1f1;
+    color: rgb(0,0,0);
 }
 
 .sidenav .closebtn {

@@ -229,7 +229,7 @@ Upload.prototype.progressHandling = function (event) {
 };
 
 
-$("#file").on("change", e => {
+$("#file").on("change", function (e) {
     var file = $(this)[0].files[0];
     var upload = new Upload(file);
     // execute upload
