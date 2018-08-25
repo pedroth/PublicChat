@@ -2,10 +2,10 @@ var uID = "id" + (Math.random() * new Date().getTime());
 var index = -1;
 var timeOutTime = 100;
 var startTime = new Date().getTime();
-var time=0;
-var timeOfWait=3;
-var timeIncrement=100;
-var pullingLimitTime=1000;
+var time = 0;
+var timeOfWait = 3;
+var timeIncrement = 100;
+var pullingLimitTime = 1000;
 
 
 function htmlEncode(value){
@@ -18,10 +18,27 @@ function htmlDecode(value){
 		  return $('<div/>').html(value).text();
 }
 
-
-
 function generateNotification(title, text) {
     var notification = new Notification(title, { body: text});
+}
+
+function optimizePulling(chat) {
+    dt = 1E-3 * (new Date().getTime() - startTime);
+    startTime = new Date().getTime();
+    time += dt;
+
+    if(chat.log.length == 0 && time >= timeOfWait){
+        timeOutTime += timeIncrement;
+        if(timeOutTime > pullingLimitTime){
+            timeOutTime = pullingLimitTime;
+        }
+        time = 0;
+    } else {
+        if(chat.log.length!=0){
+            timeOutTime = 100;
+            time = 0;
+        }
+    }
 }
 
 function getChat() {
@@ -60,28 +77,7 @@ function getChat() {
                 index += chat.log.length;
             }
             $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
-            
-            //Optimize Pulling-----------------------------
-            dt = 1E-3 * (new Date().getTime() - startTime);
-            startTime = new Date().getTime();
-            time += dt;
-            
-            
-            if(chat.log.length==0 && time>=timeOfWait){
-                timeOutTime+=timeIncrement;
-                if(timeOutTime>pullingLimitTime){
-                    timeOutTime=pullingLimitTime;
-                }
-                time=0;
-            }
-            else{
-                if(chat.log.length!=0){
-                    
-                    timeOutTime=100;
-                    time=0;
-                }
-            }
-            //Pulling Optimization------------------------------------
+            optimizePulling(chat);
             setTimeout(getChat, timeOutTime);
         }
     });
@@ -137,8 +133,17 @@ function clearServer() {
 
 $("#clear").click(clearServer);
 $("#send").click(sendText);
-$("#changeNameButton").click(function() { uID = $("#myIdIn").val() });
+$("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
 $("#myIdIn").val(uID);
+
+$("#sidebarCollapse").click(() => {
+    $("#sideBar").slideToggle();
+    if($("#sidebarCollapse").text() == ">>") {
+        $("#sidebarCollapse").html("<span> << <span>");
+    } else {
+        $("#sidebarCollapse").html("<span> >> <span>");
+    }
+})
 
 hideIfMobile();
 getChat();
@@ -224,5 +229,4 @@ $("#file").on("change", function (e) {
     // execute upload
     upload.doUpload();
 });
-
 $("#progress-wrp").css("visibility", "hidden");
