@@ -8,6 +8,8 @@ var timeIncrement=100;
 var pullingLimitTime=1000;
 
 
+
+
 function htmlEncode(value){
 		  //create a in-memory div, set it's inner text(which jQuery automatically encodes)
 		  //then grab the encoded contents back out.  The div never exists on the page.
@@ -33,29 +35,42 @@ function getChat() {
            index : index
         },
         success: function(result) {
+            
+            
+           
+            
+            
             var pattern = new RegExp('^(https?:\/\/)');
             var chat = JSON.parse(result);
+            
             if(chat.needClean) {
                 $("#chat").empty();
                 index = -1;
+                
             } else {
+                
                 $("#numberOfUsers").html(chat.users.length);
                 $("#userNames").empty()
                 for(var i = 0; i < chat.users.length; i++) {
                     $("#userNames").append("<li>" + chat.users[i] + "</li>");
+                    
                 }
                 for(var i = 0; i < chat.log.length; i++) {
+                    
                     // replace new line in http (%0A) by new line in HTML (<br />) then  decode http and replace spaces in http(+) by a space char
                     var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
                     var id = decodeURIComponent(chat.log[i].id);
-                    if(pattern.test(text)) {
+                    
+                    /*if(pattern.test(text)) {
                         $("#chat").append("<p>" + id + " > <a target='_blank' href='" + text +  "'>" + text + "</a></p>");
                     } else {
                         $("#chat").append("<p>" + id + " > " + text + "</p>");
                     }
                     if(id !== uID) {
                         generateNotification("PublicChat", id + " > " + text);
-                    }
+                    }*/
+                    
+                    $("#chat").append("<p>" + id + " > " + htmlEncode(text) + "</p>");
                 }
                 index += chat.log.length;
             }
@@ -80,8 +95,13 @@ function getChat() {
                     timeOutTime=100;
                     time=0;
                 }
+                
+            
             }
             //Pulling Optimization------------------------------------
+            
+            
+            
             setTimeout(getChat, timeOutTime);
         }
     });
