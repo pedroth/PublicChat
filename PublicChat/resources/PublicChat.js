@@ -55,7 +55,7 @@ function getChat() {
                 }
                 index += chat.log.length;
             }
-
+            $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
             setTimeout(getChat, timeOutTime);
         }
     });
@@ -199,4 +199,4 @@ $("#file").on("change", function (e) {
     upload.doUpload();
 });
 
-$("#progress-wrp").css("visibility", "hidden")
+$("#progress-wrp").css("visibility", "hidden");
