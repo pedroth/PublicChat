@@ -1,7 +1,11 @@
 var uID = "id" + (Math.random() * new Date().getTime());
 var index = -1;
 var timeOutTime = 100;
-
+var startTime = new Date().getTime();
+var time=0;
+var timeOfWait=3;
+var timeIncrement=100;
+var pullingLimitTime=1000;
 
 
 function htmlEncode(value){
@@ -56,6 +60,28 @@ function getChat() {
                 index += chat.log.length;
             }
             $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
+            
+            //Optimize Pulling-----------------------------
+            dt = 1E-3 * (new Date().getTime() - startTime);
+            startTime = new Date().getTime();
+            time += dt;
+            
+            
+            if(chat.log.length==0 && time>=timeOfWait){
+                timeOutTime+=timeIncrement;
+                if(timeOutTime>pullingLimitTime){
+                    timeOutTime=pullingLimitTime;
+                }
+                time=0;
+            }
+            else{
+                if(chat.log.length!=0){
+                    
+                    timeOutTime=100;
+                    time=0;
+                }
+            }
+            //Pulling Optimization------------------------------------
             setTimeout(getChat, timeOutTime);
         }
     });
