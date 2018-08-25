@@ -10,54 +10,49 @@
 </head>
 <body>
 
+<div id="mySidenav" class="sidenav">
+    <h4>Users</h4>
+    <div class="form-group">
+        <label>MyId : </label>
+        <input type="text" class="form-control" id="myIdIn">
+        <button type="button" class="btn btn-default" id="changeNameButton">Change ID</button>
+    </div>
+    <div class="form-group">
+        <label>Number of users : </label>
+        <label id="numberOfUsers">0</label>
+    </div>
+    <ul class="nav nav-pills nav-stacked" id="userNames"></ul>
+</div>
 
-<button type="button" id="sidebarCollapse" class="btn btn-info">
-    <span>>></span>
-</button>
-<div class="container-fluid" id="container">
-    <div class="row content">
-        <div class="col-sm-auto sidenav" id="sideBar">
-            <h4>Users</h4>
-            <div class="form-group">
-                <label>MyId : </label>
-                <input type="text" class="form-control" id="myIdIn">
-                <button type="button" class="btn btn-default" id="changeNameButton">Change ID</button>
-            </div>
-            <div class="form-group">
-                <label>Number of users : </label>
-                <label id="numberOfUsers">0</label>
-            </div>
-            <ul class="nav nav-pills nav-stacked" id="userNames"></ul>
-        </div>
-
-        <div class="col-sm-auto">
-            <h4>Chat:</h4>
-
-            <div id="chat" style="overflow:auto;height:200px;"></div>
-            <div class="form-group">
-                <label> Input: </label>
-                <textarea class="form-control" rows="3" id="input" onkeypress="inputKeyPress(event)"></textarea>
-                <br>
-
-                <p id="shiftPlusEnterP">shift + Enter = new line</p>
-            </div>
-            <div class="form-group">
-                <button type="button" class="btn btn-default" id="send">Send</button>
-                <button type="button" class="btn btn-default" id="clear">Clear Server</button>
-            </div>
-            <div class="form-group">
-                <input type="file" id="file"/>
-                <div id="progress-wrp">
-                    <div class="progress-bar"></div>
-                    <div class="status">0%</div>
-                </div>
-            </div>
+<footer id="main">
+    <div class="jumbotron">
+        <h1><span style="font-size:60px;cursor:pointer" id="burger" isOn="true">&#9776;</span>Public Chat</h1>
+    </div>
+    <div>
+        <h4>Chat:</h4>
+        <div id="chat" style="overflow:auto;height:200px;"></div>
+    </div>
+    <div >
+        <label> Input: </label>
+        <textarea class="form-control" rows="3" id="input" onkeypress="inputKeyPress(event)"></textarea>
+        <br>
+        <p id="shiftPlusEnterP">shift + Enter = new line</p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-default" id="send">Send</button>
+        <button type="button" class="btn btn-default" id="clear">Clear Server</button>
+    </div>
+    <div >
+        <input type="file" id="file"/>
+        <div id="progress-wrp">
+            <div class="progress-bar"></div>
+            <div class="status">0%</div>
         </div>
     </div>
+    <footer>
+        <a target='_blank' href="https://github.com/pedroth/publicChat"><p>Code</p></a>
+    </footer>
 </div>
-<footer class="container-fluid">
-    <a target='_blank' href="https://github.com/pedroth/publicChat"><p>Code</p></a>
-</footer>
 <script type="text/javascript" src="PublicChat.js"></script>
 </body>
 </html>

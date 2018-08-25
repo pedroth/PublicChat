@@ -1,11 +1,6 @@
-/* Set gray background color and 100% height */
-.sidenav {
-        background-color: #f1f1f1;
-}
-
 footer {
         background-color: #f1f1f1;
-        padding: 15px;
+        padding: 0px;
 }
 
 #progress-wrp {
@@ -38,4 +33,50 @@ footer {
 
 #formInput {
     box-sizing:border-box
+}
+
+body {
+    font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #f1f1f1;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav * {
+    text-decoration: none;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 0px;
+    background-color: rgb(255, 255, 255);
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
 }

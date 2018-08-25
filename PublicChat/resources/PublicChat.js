@@ -7,18 +7,29 @@ var timeOfWait = 3;
 var timeIncrement = 100;
 var pullingLimitTime = 1000;
 
-
-function htmlEncode(value){
-		  //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-		  //then grab the encoded contents back out.  The div never exists on the page.
-		  return $('<div/>').text(value).html();
+function toggleNav() {
+    if($("#burger").attr("isOn") == "true") {
+        document.getElementById("mySidenav").style.width = "0";
+        document.getElementById("main").style.marginLeft= "0";
+        $("#burger").html("&#9776;")
+        $("#burger").attr("isOn", "false");
+    } else {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.getElementById("main").style.marginLeft = "250px";
+        $("#burger").html("&times;");
+        $("#burger").attr("isOn", "true");
+    }
 }
 
-function htmlDecode(value){
-		  return $('<div/>').html(value).text();
+function htmlEncode(value) {
+    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+    //then grab the encoded contents back out.  The div never exists on the page.
+    return $('<div/>').text(value).html();
 }
 
-
+function htmlDecode(value) {
+    return $('<div/>').html(value).text();
+}
 
 function generateNotification(title, text) {
     var notification = new Notification(title, { body: text});
@@ -78,7 +89,7 @@ function getChat() {
                 }
                 index += chat.log.length;
             }
-            $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
+            $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
             optimizePulling(chat);
             setTimeout(getChat, timeOutTime);
         }
@@ -137,15 +148,8 @@ $("#clear").click(clearServer);
 $("#send").click(sendText);
 $("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
 $("#myIdIn").val(uID);
+$("#burger").click(toggleNav);
 
-$("#sidebarCollapse").click(() => {
-    $("#sideBar").slideToggle();
-    if($("#sidebarCollapse").text() == ">>") {
-        $("#sidebarCollapse").html("<span> << <span>");
-    } else {
-        $("#sidebarCollapse").html("<span> >> <span>");
-    }
-})
 
 hideIfMobile();
 getChat();
@@ -225,7 +229,7 @@ Upload.prototype.progressHandling = function (event) {
 };
 
 
-$("#file").on("change", function (e) {
+$("#file").on("change", e => {
     var file = $(this)[0].files[0];
     var upload = new Upload(file);
     // execute upload
