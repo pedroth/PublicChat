@@ -24,6 +24,22 @@ function toggleNav() {
     }
 }
 
+function isPhone() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function isChrome() {
+    return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+}
+
+function hideIfMobile() {
+    if(isPhone()) {
+        $("#shiftPlusEnterP").hide();
+    }else {
+        $("#send").hide();
+    }
+}
+
 function htmlEncode(value) {
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
     //then grab the encoded contents back out.  The div never exists on the page.
@@ -73,12 +89,15 @@ function getChat() {
                     // replace new line in http (%0A) by new line in HTML (<br />) then  decode http and replace spaces in http(+) by a space char
                     var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
                     var id = decodeURIComponent(chat.log[i].id);
-                    if(pattern.test(text)) {
-                        $("#chat").append("<p>" + id + " > <a target='_blank' href='" + htmlEncode(text) +  "'>" + text + "</a></p>");
-                    } else {
-                        $("#chat").append("<p>" + id + " > " + htmlEncode(text) + "</p>");
-                    }
-                    if(id !== uID) {
+                    var split = text.split("<br />");
+                    split.forEach(t => {
+                        if(pattern.test(t)) {
+                            $("#chat").append(`<p> ${id} > <a target='_blank' href='${htmlEncode(t)}' > ${t} </a></p>`);
+                        } else {
+                            $("#chat").append("<p>" + id + " > " + htmlEncode(t) + "</p>")
+                        }
+                    });
+                    if(id !== uID && !(isPhone() && isChrome())) {
                         generateNotification("PublicChat", id + " > " + text);
                     }
                 }
@@ -114,14 +133,6 @@ function sendText() {
 function inputKeyPress(event) {
     if("Enter" === event.key && !event.shiftKey) {
         sendText();
-    }
-}
-
-function hideIfMobile() {
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        $("#shiftPlusEnterP").hide();
-    }else {
-        $("#send").hide();
     }
 }
 
