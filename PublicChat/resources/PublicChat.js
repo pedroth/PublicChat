@@ -43,9 +43,8 @@ function optimizePulling() {
     startTime = new Date().getTime();
     time += dt;
 
-    $("#chat").append(`<p>${uID} > ${dt}</p>`);
-
     console.log(dt);
+
     timeOutTime = Math.abs(index - oldIndex) > 0 ? timeOutTimeBase : timeOutTime * 1.2;
     timeOutTime = Math.min(timeOutTime, pullingLimitTime);
 }
@@ -59,8 +58,6 @@ function getChat() {
            index : index
         },
         success: function(result) {
-            setTimeout(getChat, timeOutTime);
-
             var pattern = new RegExp('^(https?:\/\/)');
             var chat = JSON.parse(result);
             if(chat.needClean) {
@@ -90,6 +87,7 @@ function getChat() {
                 $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
             }
             optimizePulling();
+            setTimeout(getChat, timeOutTime);
         }
     });
 }
