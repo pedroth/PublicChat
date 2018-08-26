@@ -1,11 +1,14 @@
 var uID = "id" + (Math.random() * new Date().getTime());
+
+var oldIndex = -1
 var index = -1;
+
 var timeOutTime = 100;
+var timeOutTimeBase = timeOutTime;
+var pullingLimitTime = 5000;
+
 var startTime = new Date().getTime();
 var time = 0;
-var timeOfWait = 3;
-var timeIncrement = 100;
-var pullingLimitTime = 1000;
 
 function toggleNav() {
     if($("#burger").attr("isOn") == "true") {
@@ -35,23 +38,16 @@ function generateNotification(title, text) {
     var notification = new Notification(title, { body: text});
 }
 
-function optimizePulling(chat) {
-    dt = 1E-3 * (new Date().getTime() - startTime);
+function optimizePulling() {
+    var dt = 1E-3 * (new Date().getTime() - startTime);
     startTime = new Date().getTime();
     time += dt;
 
-    if(chat.log.length == 0 && time >= timeOfWait){
-        timeOutTime += timeIncrement;
-        if(timeOutTime > pullingLimitTime){
-            timeOutTime = pullingLimitTime;
-        }
-        time = 0;
-    } else {
-        if(chat.log.length!=0){
-            timeOutTime = 100;
-            time = 0;
-        }
-    }
+    $("#chat").append(`<p>${uID} > ${dt}</p>`);
+
+    console.log(dt);
+    timeOutTime = Math.abs(index - oldIndex) > 0 ? timeOutTimeBase : timeOutTime * 1.2;
+    timeOutTime = Math.min(timeOutTime, pullingLimitTime);
 }
 
 function getChat() {
@@ -63,6 +59,8 @@ function getChat() {
            index : index
         },
         success: function(result) {
+            setTimeout(getChat, timeOutTime);
+
             var pattern = new RegExp('^(https?:\/\/)');
             var chat = JSON.parse(result);
             if(chat.needClean) {
@@ -87,11 +85,11 @@ function getChat() {
                         generateNotification("PublicChat", id + " > " + text);
                     }
                 }
+                oldIndex = index;
                 index += chat.log.length;
+                $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
             }
-            $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
-            optimizePulling(chat);
-            setTimeout(getChat, timeOutTime);
+            optimizePulling();
         }
     });
 }
