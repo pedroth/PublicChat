@@ -1,10 +1,57 @@
 var uID = "id" + (Math.random() * new Date().getTime());
 var index = -1;
 var timeOutTime = 100;
+var startTime = new Date().getTime();
+var time = 0;
+var timeOfWait = 3;
+var timeIncrement = 100;
+var pullingLimitTime = 1000;
 
+function toggleNav() {
+    if($("#burger").attr("isOn") == "true") {
+        document.getElementById("mySidenav").style.width = "0";
+        document.getElementById("main").style.marginLeft= "0";
+        $("#burger").html("&#9776;")
+        $("#burger").attr("isOn", "false");
+    } else {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.getElementById("main").style.marginLeft = "250px";
+        $("#burger").html("&times;");
+        $("#burger").attr("isOn", "true");
+    }
+}
+
+function htmlEncode(value) {
+    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+    //then grab the encoded contents back out.  The div never exists on the page.
+    return $('<div/>').text(value).html();
+}
+
+function htmlDecode(value) {
+    return $('<div/>').html(value).text();
+}
 
 function generateNotification(title, text) {
     var notification = new Notification(title, { body: text});
+}
+
+function optimizePulling(chat) {
+    dt = 1E-3 * (new Date().getTime() - startTime);
+    startTime = new Date().getTime();
+    time += dt;
+
+    if(chat.log.length == 0 && time >= timeOfWait){
+        timeOutTime += timeIncrement;
+        if(timeOutTime > pullingLimitTime){
+            timeOutTime = pullingLimitTime;
+        }
+        time = 0;
+    } else {
+        if(chat.log.length!=0){
+            timeOutTime = 100;
+            time = 0;
+        }
+    }
 }
 
 function getChat() {
@@ -32,9 +79,9 @@ function getChat() {
                     var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
                     var id = decodeURIComponent(chat.log[i].id);
                     if(pattern.test(text)) {
-                        $("#chat").append("<p>" + id + " > <a target='_blank' href='" + text +  "'>" + text + "</a></p>");
+                        $("#chat").append("<p>" + id + " > <a target='_blank' href='" + htmlEncode(text) +  "'>" + text + "</a></p>");
                     } else {
-                        $("#chat").append("<p>" + id + " > " + text + "</p>");
+                        $("#chat").append("<p>" + id + " > " + htmlEncode(text) + "</p>");
                     }
                     if(id !== uID) {
                         generateNotification("PublicChat", id + " > " + text);
@@ -42,7 +89,8 @@ function getChat() {
                 }
                 index += chat.log.length;
             }
-
+            $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
+            optimizePulling(chat);
             setTimeout(getChat, timeOutTime);
         }
     });
@@ -64,10 +112,11 @@ function sendText() {
                 }
             }
         });
+    $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
 }
 
 function inputKeyPress(event) {
-    if("Enter" === event.code && !event.shiftKey) {
+    if("Enter" === event.key && !event.shiftKey) {
         sendText();
     }
 }
@@ -97,8 +146,10 @@ function clearServer() {
 
 $("#clear").click(clearServer);
 $("#send").click(sendText);
-$("#changeNameButton").click(function() { uID = $("#myIdIn").val() });
+$("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
 $("#myIdIn").val(uID);
+$("#burger").click(toggleNav);
+
 
 hideIfMobile();
 getChat();
@@ -184,5 +235,4 @@ $("#file").on("change", function (e) {
     // execute upload
     upload.doUpload();
 });
-
-$("#progress-wrp").css("visibility", "hidden")
+$("#progress-wrp").css("visibility", "hidden");
