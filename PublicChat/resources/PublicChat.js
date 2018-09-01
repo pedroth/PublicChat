@@ -136,6 +136,12 @@ function inputKeyPress(event) {
     }
 }
 
+function inputKeyId(event) {
+    if("Enter" === event.key ) {
+        uID = $("#myIdIn").val();
+    }
+}
+
 function clearServer() {
         $.ajax({
                 method:"POST",

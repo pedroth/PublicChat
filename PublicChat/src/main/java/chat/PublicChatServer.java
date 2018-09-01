@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import utils.*;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -55,8 +56,7 @@ public class PublicChatServer {
         this.stopWatch = new StopWatch();
 
         //check for dead clients
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() ->
-        {
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             double dt = stopWatch.getEleapsedTime();
             stopWatch.resetTime();
             for (String id : uID2TimeMap.keySet()) {
@@ -70,7 +70,7 @@ public class PublicChatServer {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         try {
             InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverPort);
-            System.out.println("Start public chat server at : " + inetSocketAddress);
+            System.out.println("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort +"/PublicChat");
 
             HttpServer httpServer = HttpServer.create(inetSocketAddress, 0);
             createServices(httpServer);
