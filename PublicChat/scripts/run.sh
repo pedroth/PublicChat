@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+java -Xmx3g -jar PublicChat.jar 8080

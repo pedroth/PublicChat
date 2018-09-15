@@ -26,31 +26,33 @@
 </div>
 
 <div id="main">
-    <div class="jumbotron">
-        <h1><span style="font-size:50px;cursor:pointer" id="burger" isOn="true">&#9776;</span>Public Chat</h1>
-    </div>
-    <div>
-        <h4>Chat:</h4>
-        <div id="chat" style="overflow:auto;height:200px;"></div>
-    </div>
-    <div >
-        <label> Input: </label>
-        <textarea class="form-control" rows="3" id="input" onkeypress="inputKeyPress(event)"></textarea>
-        <br>
-        <p id="shiftPlusEnterP">shift + Enter = new line</p>
-    </div>
-    <div>
-        <button type="button" class="btn btn-default" id="send">Send</button>
-        <button type="button" class="btn btn-default" id="clear">Clear Server</button>
-    </div>
-    <div >
-        <input type="file" id="file"/>
-        <div id="progress-wrp">
-            <div class="progress-bar"></div>
-            <div class="status">0%</div>
+    <div class="page-wrapper">
+        <div class="jumbotron">
+            <h1><span style="font-size:50px;cursor:pointer" id="burger" isOn="true">&#9776;</span>Public Chat</h1>
+        </div>
+        <div>
+            <h4>Chat:</h4>
+            <div id="chat"></div>
+        </div>
+        <div>
+            <label> Input: </label>
+            <textarea class="form-control" rows="3" id="input" onkeypress="inputKeyPress(event)"></textarea>
+            <br>
+            <p id="shiftPlusEnterP">shift + Enter = new line</p>
+        </div>
+        <div id="send-clear-div">
+            <button type="button" class="btn btn-default" id="send">Send</button>
+            <button type="button" class="btn btn-default" id="clear">Clear Server</button>
+        </div>
+        <div >
+            <input type="file" id="file"/>
+            <div id="progress-wrp">
+                <div class="progress-bar"></div>
+                <div class="status">0%</div>
+            </div>
         </div>
     </div>
-    <footer class="container-fluid">
+    <footer class="site-footer">
         <a target='_blank' href="https://github.com/pedroth/publicChat"><p>Code</p></a>
     </footer>
 </div>
