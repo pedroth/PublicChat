@@ -3,8 +3,8 @@
  * Public chat is a simple chat server that has the option to delete all data.
 
  ## Dependencies
- * Need Java 8+ [ http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html ]
-* Maven [ https://maven.apache.org/install.html ]
+* Need Java 8+ [ There are nice tutorials in google for any OS ]
+* Apache Maven [ Check google as well ]
 
  ## Install Public Chat
 
