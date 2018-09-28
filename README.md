@@ -1,6 +1,6 @@
 # PublicChat
 
- * Public chat is a simple chat server that has the option to delete all data.
+ * Public chat is a simple chat server that has the option to delete all data. 
 
  ## Dependencies
 * Need Java 8+ [ There are nice tutorials in google for any OS ]
