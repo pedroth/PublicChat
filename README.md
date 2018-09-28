@@ -11,7 +11,8 @@
 1) git clone the project
 	* git clone https://github.com/pedroth/PublicChat.git
 
-2) run maven clean install
+2) Go to PublicChat folder with the **pom.xml** file. Run maven clean install:
+	* cd PublicChat/PublicChat/
 	* mvn clean install
 
 3) run the batch/shell script in target/PublicChat/ folder
@@ -20,6 +21,7 @@
 4) You can also run the jar by yourself, using :
 	* java -Xmx1g -jar PublicChat **\<port>**
 		* where **\<port>** is a number, that defines the port 
+		
 5) Open browser at  **\<IP>**:**\<port>**/PublicChat
 	* eg: 192.168.1.6:8080/PublicChat
 	* eg: localhost:8000/PublicChat 
