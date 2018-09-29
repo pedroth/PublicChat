@@ -1,1 +1,1 @@
-java -Xmx3g -jar PublicChat.jar 8080
+java -Xmx1g -jar PublicChat.jar 8080

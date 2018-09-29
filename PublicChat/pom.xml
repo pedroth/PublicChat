@@ -54,7 +54,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/PublicChat/</outputDirectory>
+                            <outputDirectory>PublicChatServer</outputDirectory>
                             <finalName>PublicChat</finalName>
                             <transformers>
                                 <!-- add Main-Class to manifest file -->
@@ -79,7 +79,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/PublicChat/resources</outputDirectory>
+                            <outputDirectory>${basedir}/PublicChatServer/resources</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>resources</directory>
@@ -95,7 +95,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/PublicChat/</outputDirectory>
+                            <outputDirectory>${basedir}/PublicChatServer/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>scripts</directory>

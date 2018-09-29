@@ -11,7 +11,9 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +26,6 @@ public class PublicChatServer {
     private final static String DATA_ADDRESS = HOME_ADDRESS + "data/";
     // time in seconds
     private final static double TIMEOUT = 10;
-    private static int BUFFER_SIZE = 2000000 * (1 << 10);
     private final int serverPort;
     private List<UnitLog> logList = new ArrayList<>();
     private Map<String, Double> uID2TimeMap = new ConcurrentHashMap<>();
@@ -34,17 +35,12 @@ public class PublicChatServer {
         this.serverPort = serverPort;
     }
 
-    PublicChatServer(int serverPort, int uploadBytes) {
-        this.serverPort = serverPort;
-        BUFFER_SIZE = uploadBytes;
-    }
-
     public static void main(String[] args) {
         if (args.length > 0) {
             final String regex = "[0-9]*";
             final Pattern pattern = Pattern.compile(regex);
             final Matcher matcher = pattern.matcher(args[0]);
-            PublicChatServer publicChatServer = new PublicChatServer(matcher.find() ? Integer.valueOf(args[0]) : 8080, args.length > 1 ? Integer.valueOf(args[1]) : PublicChatServer.BUFFER_SIZE);
+            PublicChatServer publicChatServer = new PublicChatServer(matcher.find() ? Integer.valueOf(args[0]) : 8080);
             publicChatServer.start();
         } else {
             PublicChatServer publicChatServer = new PublicChatServer(8080);
@@ -70,7 +66,7 @@ public class PublicChatServer {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         try {
             InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverPort);
-            System.out.println("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort +"/PublicChat");
+            System.out.println("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort + "/PublicChat");
 
             HttpServer httpServer = HttpServer.create(inetSocketAddress, 0);
             createServices(httpServer);
@@ -174,16 +170,19 @@ public class PublicChatServer {
     private String uploadFile(HttpExchange he) throws IOException {
         int readByte;
         final InputStream requestBody = he.getRequestBody();
-        byte[] buffer = new byte[BUFFER_SIZE];
-        SMUpload smUpload = new SMUpload(buffer);
+        SMUpload smUpload = new SMUpload();
         while ((readByte = requestBody.read()) != -1) {
             smUpload.next(readByte);
         }
         String fileName = smUpload.getFileName();
-        assert fileName == null : new RuntimeException("No file name");
+
+        if (fileName == null) throw new RuntimeException("No file name");
+
         FilesCrawler.createDirs(DATA_ADDRESS);
-        try (OutputStream outputStream = new FileOutputStream(DATA_ADDRESS + fileName)) {
-            outputStream.write(buffer, 0, smUpload.getIndex());
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(DATA_ADDRESS + fileName))) {
+            StopWatch stopWatch = new StopWatch();
+            smUpload.getData().forEach(ConsumerWithException.wrap(outputStream::write));
+            System.out.println("<<<<<  " + stopWatch.getEleapsedTime() + "  >>>>>");
         }
         return fileName;
     }

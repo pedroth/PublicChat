@@ -4,11 +4,13 @@ package chat;
 import utils.State;
 import utils.SuffixTreeTokenizer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 class SMUpload {
     private String fileName;
-    private byte[] buffer;
+    private List<Integer> data;
     private State<Integer> state;
     private int index = 0;
 
@@ -22,7 +24,6 @@ class SMUpload {
     private State<Integer> stateFour = new State<Integer>() {
         final String regex = "------WebKitFormBoundary";
         private SuffixTreeTokenizer tokenizer;
-
         {
             tokenizer = new SuffixTreeTokenizer(new String[]{regex});
             tokenizer.init();
@@ -31,9 +32,7 @@ class SMUpload {
         @Override
         public State<Integer> next(Integer x) {
             final Optional<String> token = tokenizer.next((char) x.intValue());
-            if (index < buffer.length) {
-                buffer[index] = x.byteValue();
-            }
+            data.add(x);
             if (token.isPresent()) {
                 index = index - regex.length() + 1;
                 return stateFive;
@@ -92,8 +91,8 @@ class SMUpload {
         }
     };
 
-    SMUpload(byte[] buffer) {
-        this.buffer = buffer;
+    SMUpload() {
+        this.data = new ArrayList<>(100);
         this.state = this.stateOne;
     }
 
@@ -103,6 +102,10 @@ class SMUpload {
 
     int getIndex() {
         return index;
+    }
+
+    List<Integer> getData() {
+        return this.data;
     }
 
     void next(int c) {
