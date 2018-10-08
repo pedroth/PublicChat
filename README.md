@@ -16,9 +16,10 @@
 	* mvn clean install
 
 3) run the batch/shell script in PublicChatServer/ folder
-	* Click on the run.bat [Windows] or run *sh run.sh [Linux]* in a terminal
+	* [Windows]: Click on the run.bat
+	* [Linux]: Type *sh run.sh* in a terminal
 
-4) You can also run the jar by yourself, using :
+4) You can also run the jar by yourself, using:
 	* java -Xmx1g -jar PublicChat **\<port>**
 		* where **\<port>** is a number, that defines the port 
 		
