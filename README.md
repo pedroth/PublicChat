@@ -11,9 +11,15 @@
 1) git clone the project
 	* git clone https://github.com/pedroth/PublicChat.git
 
-2) Go to PublicChat folder with the **pom.xml** file. Run maven clean install:
+2) Run install/install.bat[sh]:
+    * [Windows]: Click on bat file
+    * [Linux]: cd sh install/install.sh
+
+   Or go to PublicChat folder with the **pom.xml** file and run maven clean install:
 	* cd PublicChat/PublicChat/
 	* mvn clean install
+
+The public chat server is built on folder PublicChatServer.
 
 3) run the batch/shell script in PublicChatServer/ folder
 	* [Windows]: Click on the run.bat
