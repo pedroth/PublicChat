@@ -4,13 +4,14 @@ package chat;
 import utils.State;
 import utils.SuffixTreeTokenizer;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 class SMUpload {
     private String fileName;
-    private List<Integer> data;
+    private LinkedList<Integer> data;
     private State<Integer> state;
     private int index = 0;
 
@@ -24,6 +25,7 @@ class SMUpload {
     private State<Integer> stateFour = new State<Integer>() {
         final String regex = "------WebKitFormBoundary";
         private SuffixTreeTokenizer tokenizer;
+
         {
             tokenizer = new SuffixTreeTokenizer(new String[]{regex});
             tokenizer.init();
@@ -32,11 +34,12 @@ class SMUpload {
         @Override
         public State<Integer> next(Integer x) {
             final Optional<String> token = tokenizer.next((char) x.intValue());
-            data.add(x);
             if (token.isPresent()) {
                 index = index - regex.length() + 1;
+                IntStream.range(0, regex.length() + 1).forEach(v -> data.pollLast());
                 return stateFive;
             }
+            data.add(x);
             index++;
             return stateFour;
         }
@@ -83,16 +86,14 @@ class SMUpload {
 
         @Override
         public State<Integer> next(Integer x) {
-            final Optional<String> next = tokenizer.next((char) x.intValue());
-            if (next.isPresent()) {
-                return stateTwo;
-            }
-            return stateOne;
+            return tokenizer.next((char) x.intValue())
+                    .map(v -> stateTwo)
+                    .orElse(stateOne);
         }
     };
 
     SMUpload() {
-        this.data = new ArrayList<>(100);
+        this.data = new LinkedList<>();
         this.state = this.stateOne;
     }
 

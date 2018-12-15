@@ -5,7 +5,7 @@ var index = -1;
 
 var timeOutTime = 100;
 var timeOutTimeBase = timeOutTime;
-var pullingLimitTime = 5000;
+var pullingLimitTime = 1000;
 
 var startTime = new Date().getTime();
 var time = 0;
@@ -61,7 +61,7 @@ function optimizePulling() {
 
     console.log(dt);
 
-    timeOutTime = Math.abs(index - oldIndex) > 0 ? timeOutTimeBase : timeOutTime * 1.2;
+    timeOutTime = Math.abs(index - oldIndex) > 0 ? timeOutTimeBase : timeOutTime + 5;
     timeOutTime = Math.min(timeOutTime, pullingLimitTime);
 }
 
@@ -103,7 +103,6 @@ function getChat() {
                 }
                 oldIndex = index;
                 index += chat.log.length;
-                $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
             }
             optimizePulling();
             setTimeout(getChat, timeOutTime);
