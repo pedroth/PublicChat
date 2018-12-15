@@ -80,11 +80,11 @@ function optimizeScroll() {
     let diffChat = $("#chat").prop("scrollHeight") - $("#chat").prop("scrollTop");
     if( diffChat < baseDiffChat){
         missedNotifications = 0;
-        $("#chatHeader").html(`ChatHeader:`);
+        $("#chatHeader").html(`Chat:`);
         document.title = `PublicChat`;
         scrollDown();
     } else if(diffLog > 0) {
-        $("#chatHeader").html(`ChatHeader:<a onclick=scrollDown()>Scroll down <i class="fas fa-chevron-down"></i></a>`);
+        $("#chatHeader").html(`Chat:<a onclick=scrollDown()>Scroll down <i class="fas fa-chevron-down"></i></a>`);
         missedNotifications += diffLog;
         document.title = `(${missedNotifications})PublicChat`;
     }
