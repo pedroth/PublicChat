@@ -1,11 +1,15 @@
 var uID = "id" + (Math.random() * new Date().getTime());
 
+
+var isFirstTime = true;
 var oldIndex = -1
 var index = -1;
 
 var timeOutTime = 100;
 var timeOutTimeBase = timeOutTime;
 var pullingLimitTime = 1000;
+var baseDiffChat = 400;
+var missedNotifications = 0;
 
 var startTime = new Date().getTime();
 var time = 0;
@@ -58,11 +62,39 @@ function optimizePulling() {
     var dt = 1E-3 * (new Date().getTime() - startTime);
     startTime = new Date().getTime();
     time += dt;
-
-    console.log(dt);
-
-    timeOutTime = Math.abs(index - oldIndex) > 0 ? timeOutTimeBase : timeOutTime + 5;
+    timeOutTime = index - oldIndex > 0 ? timeOutTimeBase : timeOutTime + 5;
     timeOutTime = Math.min(timeOutTime, pullingLimitTime);
+}
+
+function scrollDown() {
+    $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
+}
+
+function optimizeScroll() {
+    if(isFirstTime) {
+        scrollDown();
+        isFirstTime = false;
+        return;
+    }
+    let diffLog = index - oldIndex;
+    let diffChat = $("#chat").prop("scrollHeight") - $("#chat").prop("scrollTop");
+    if( diffChat < baseDiffChat){
+        missedNotifications = 0;
+        $("#chatHeader").html(`ChatHeader:`);
+        document.title = `PublicChat`;
+        scrollDown();
+    } else if(diffLog > 0) {
+        $("#chatHeader").html(`ChatHeader:<a onclick=scrollDown()>Scroll down <i class="fas fa-chevron-down"></i></a>`);
+        missedNotifications += diffLog;
+        document.title = `(${missedNotifications})PublicChat`;
+    }
+}
+
+function optimizeNotification(id, text) {
+    let diffChat = $("#chat").prop("scrollHeight") - $("#chat").prop("scrollTop");
+    if(id !== uID && !(isPhone() && isChrome()) && diffChat > baseDiffChat) {
+        generateNotification("PublicChat", id + " > " + text);
+    }
 }
 
 function getChat() {
@@ -97,14 +129,13 @@ function getChat() {
                             $("#chat").append("<p>" + id + " > " + htmlEncode(t) + "</p>")
                         }
                     });
-                    if(id !== uID && !(isPhone() && isChrome())) {
-                        generateNotification("PublicChat", id + " > " + text);
-                    }
+                    optimizeNotification(id, text)
                 }
                 oldIndex = index;
                 index += chat.log.length;
             }
             optimizePulling();
+            optimizeScroll();
             setTimeout(getChat, timeOutTime);
         }
     });
@@ -155,22 +186,6 @@ function clearServer() {
                 }
             });
 }
-
-$("#clear").click(clearServer);
-$("#send").click(sendText);
-$("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
-$("#myIdIn").val(uID);
-$("#burger").click(toggleNav);
-
-
-hideIfMobile();
-getChat();
-
-document.addEventListener('DOMContentLoaded', function () {
-  if (Notification.permission !== "granted")
-    Notification.requestPermission();
-});
-
 
 // taken from https://stackoverflow.com/questions/2320069/jquery-ajax-file-upload answer by Ziinloader
 var Upload = function (file) {
@@ -240,6 +255,21 @@ Upload.prototype.progressHandling = function (event) {
     }
 };
 
+
+// init
+$("#clear").click(clearServer);
+$("#send").click(sendText);
+$("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
+$("#myIdIn").val(uID);
+$("#burger").click(toggleNav);
+
+hideIfMobile();
+getChat();
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (Notification.permission !== "granted")
+    Notification.requestPermission();
+});
 
 $("#file").on("change", function (e) {
     var file = $(this)[0].files[0];
