@@ -6,9 +6,6 @@ var oldIndex = -1
 var index = -1;
 
 var timeOutTime = 100;
-var timeOutTimeBase = timeOutTime;
-var pullingLimitTime = 1000;
-var baseDiffChat = 400;
 var missedNotifications = 0;
 
 var startTime = new Date().getTime();
@@ -59,6 +56,8 @@ function generateNotification(title, text) {
 }
 
 function optimizePulling() {
+    var timeOutTimeBase = 100;
+    var pullingLimitTime = 3000;
     var dt = 1E-3 * (new Date().getTime() - startTime);
     startTime = new Date().getTime();
     time += dt;
@@ -70,30 +69,33 @@ function scrollDown() {
     $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
 }
 
-function optimizeScroll() {
+function isEndChat() {
+    let chat = $("#chat");
+    return chat.prop("scrollTop") + chat.prop("offsetHeight") == chat.prop("scrollHeight");
+}
+
+function optimizeScroll(isEndChat) {
     if(isFirstTime) {
         scrollDown();
         isFirstTime = false;
         return;
     }
-    let diffLog = index - oldIndex;
-    let diffChat = $("#chat").prop("scrollHeight") - $("#chat").prop("scrollTop");
-    if( diffChat < baseDiffChat){
+    if(isEndChat){
         missedNotifications = 0;
         $("#chatHeader").html(`Chat:`);
         document.title = `PublicChat`;
         scrollDown();
-    } else if(diffLog > 0) {
-        $("#chatHeader").html(`Chat:<a onclick=scrollDown()>Scroll down <i class="fas fa-chevron-down"></i></a>`);
+    } else {
+        let diffLog = index - oldIndex;
         missedNotifications += diffLog;
+        $("#chatHeader").html(`Chat:<a onclick=scrollDown()>Scroll down${missedNotifications == 0 ? "" : `(${missedNotifications})`} <i class="fas fa-chevron-down"></i></a>`);
         document.title = `(${missedNotifications})PublicChat`;
     }
 }
 
 function optimizeNotification(id, text) {
-    let diffChat = $("#chat").prop("scrollHeight") - $("#chat").prop("scrollTop");
-    if(id !== uID && !(isPhone() && isChrome()) && diffChat > baseDiffChat) {
-        generateNotification("PublicChat", id + " > " + text);
+    if(id !== uID && !isChrome() && document.visibilityState == "hidden") {
+        generateNotification("PublicChat", `${id} > ${text}`);
     }
 }
 
@@ -117,6 +119,7 @@ function getChat() {
                 for(var i = 0; i < chat.users.length; i++) {
                     $("#userNames").append("<li>" + chat.users[i] + "</li>");
                 }
+                let endChat = isEndChat();
                 for(var i = 0; i < chat.log.length; i++) {
                     // replace new line in http (%0A) by new line in HTML (<br />) then  decode http and replace spaces in http(+) by a space char
                     var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
@@ -129,13 +132,14 @@ function getChat() {
                             $("#chat").append("<p>" + id + " > " + htmlEncode(t) + "</p>")
                         }
                     });
-                    optimizeNotification(id, text)
+                    optimizeNotification(id, text);
                 }
+                optimizeScroll(endChat);
                 oldIndex = index;
                 index += chat.log.length;
             }
             optimizePulling();
-            optimizeScroll();
+            console.log(timeOutTime);
             setTimeout(getChat, timeOutTime);
         }
     });
