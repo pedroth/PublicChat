@@ -1,4 +1,52 @@
-var uID = "id" + (Math.random() * new Date().getTime());
+var NameGenerator = function() {
+    this.alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+    this.randomInt = (min, max) => {
+        let diff = max  -  min;
+        return Math.floor(min + Math.random() * diff);
+    }
+
+    this.powInt = (x, n) => {
+      if(n == 0) return 1;
+      if(n == 1) return x;
+      // n > 1
+      var q = Math.floor(n / 2);
+      var r = n % 2;
+      if(r == 0)
+        return this.powInt(x * x, q);
+      else
+        return x * this.powInt(x * x, q);
+    }
+
+    // n must be in [0, ..., this.alphabet.length - 1]
+    this.number2Alpha = n => {
+        return this.alphabet[n];
+    }
+
+    this.coding = n => {
+        var code = [];
+        let b = this.alphabet.length;
+        while(n > 0) {
+            code.push(n % b);
+            n = Math.floor(n / b);
+        }
+        return code;
+    }
+
+    this.generateName = () => {
+        let randInt = this.randomInt(0,18);
+        let nameNumber = Math.floor(this.powInt(10, randInt) * Math.random());
+        let n = this.alphabet.length;
+        let remainderArray = this.coding(nameNumber);
+        var strBuilder = [];
+        for(let i = 0; i < remainderArray.length; i++) {
+            strBuilder.push(this.number2Alpha(remainderArray[remainderArray.length - i - 1]));
+        }
+        return strBuilder.join("");
+    }
+}
+
+var uID = new NameGenerator().generateName();
 
 var isFirstTime = true;
 var oldIndex = -1
@@ -189,54 +237,6 @@ function clearServer() {
             });
 }
 
-var NameGenerator = function() {
-    this.alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-    this.randomInt = (min, max) => {
-        let diff = max  -  min;
-        return Math.floor(min + Math.random() * diff);
-    }
-
-    this.powInt = (x, n) => {
-      if(n == 0) return 1;
-      if(n == 1) return x;
-      // n > 1
-      var q = Math.floor(n / 2);
-      var r = n % 2;
-      if(r == 0)
-        return this.powInt(x * x, q);
-      else
-        return x * this.powInt(x * x, q);
-    }
-
-    // n must be in [0, ..., this.alphabet.length - 1]
-    this.number2Alpha = n => {
-        return this.alphabet[n];
-    }
-
-    this.coding = n => {
-        var code = [];
-        let b = this.alphabet.length;
-        while(n > 0) {
-            code.push(n % b);
-            n = Math.floor(n / b);
-        }
-        return code;
-    }
-
-    this.generateName = () => {
-        let randInt = this.randomInt(0,18);
-        let nameNumber = Math.floor(this.powInt(10, randInt) * Math.random());
-        let n = this.alphabet.length;
-        let remainderArray = this.coding(nameNumber);
-        var strBuilder = [];
-        for(let i = 0; i < remainderArray.length; i++) {
-            strBuilder.push(this.number2Alpha(remainderArray[remainderArray.length - i - 1]));
-        }
-        return strBuilder.join("");
-    }
-}
-
 // taken from https://stackoverflow.com/questions/2320069/jquery-ajax-file-upload answer by Ziinloader
 var Upload = function (file) {
     this.file = file;
@@ -306,8 +306,6 @@ Upload.prototype.progressHandling = function (event) {
 };
 
 // init
-uID = new NameGenerator().generateName();
-
 $("#clear").click(clearServer);
 $("#send").click(sendText);
 $("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
