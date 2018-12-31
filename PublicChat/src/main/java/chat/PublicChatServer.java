@@ -66,7 +66,7 @@ public class PublicChatServer {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         try {
             InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverPort);
-            System.out.println("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort + "/PublicChat");
+            log.info("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort + "/PublicChat");
 
             HttpServer httpServer = HttpServer.create(inetSocketAddress, 0);
             createServices(httpServer);
@@ -104,12 +104,12 @@ public class PublicChatServer {
                 }
                 Map<String, String> stringMap = JServerUtils.parsePostMessage(text);
                 for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    System.out.println(entry.getKey() + " : " + entry.getValue());
+                    log.info(entry.getKey() + " : " + entry.getValue());
                 }
                 String id = stringMap.get("id");
                 putClientInMap(id);
                 String jsonAns = getLogInfo(Integer.valueOf(stringMap.get("index").replaceAll("\n", "")));
-                System.out.println(jsonAns);
+                log.info(jsonAns);
                 JServerUtils.respondWithText(httpExchange, jsonAns);
             } catch (Exception e) {
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
@@ -124,7 +124,7 @@ public class PublicChatServer {
                 textIO.read(httpExchange.getRequestBody());
                 Map<String, String> stringMap = JServerUtils.parsePostMessageUnformatted(textIO.getText());
                 for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    System.out.println(entry.getKey() + " : " + entry.getValue());
+                    log.info(entry.getKey() + " : " + entry.getValue());
                 }
                 String id = stringMap.get("id");
                 putClientInMap(id);
@@ -142,7 +142,7 @@ public class PublicChatServer {
                 textIO.read(httpExchange.getRequestBody());
                 Map<String, String> stringMap = JServerUtils.parsePostMessage(textIO.getText());
                 for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    System.out.println(entry.getKey() + " : " + entry.getValue());
+                    log.info(entry.getKey() + " : " + entry.getValue());
                 }
                 this.logList.removeAll(this.logList);
                 removeData();
@@ -182,7 +182,7 @@ public class PublicChatServer {
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(DATA_ADDRESS + fileName))) {
             StopWatch stopWatch = new StopWatch();
             smUpload.getData().forEach(ConsumerWithException.wrap(outputStream::write));
-            System.out.println("<<<<<  " + stopWatch.getEleapsedTime() + "  >>>>>");
+            log.info("<<<<<  " + stopWatch.getEleapsedTime() + "  >>>>>");
         }
         return fileName;
     }
@@ -226,8 +226,8 @@ public class PublicChatServer {
 
     private void printClientData(HttpExchange httpExchange) {
         URI requestURI = httpExchange.getRequestURI();
-        System.out.println(httpExchange.getRequestMethod() + " " + requestURI);
-        System.out.println("address : " + httpExchange.getRemoteAddress());
+        log.info(httpExchange.getRequestMethod() + " " + requestURI);
+        log.info("address : " + httpExchange.getRemoteAddress());
     }
 
     private void putClientInMap(String id) {
