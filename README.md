@@ -32,3 +32,7 @@ The public chat server is built on folder PublicChatServer.
 5) Open browser at  **\<IP>**:**\<port>**/PublicChat
 	* eg: 192.168.1.6:8080/PublicChat
 	* eg: localhost:8000/PublicChat 
+
+## Demo
+
+A public instance of the public chat is [here](http://pedroth.duckdns.org:8080/PublicChat)
