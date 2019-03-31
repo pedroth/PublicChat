@@ -20,7 +20,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.mkyong" level="debug" additivity="false">
+    <logger level="debug" additivity="false">
         <appender-ref ref="FILE-ROLLING"/>
     </logger>
 
