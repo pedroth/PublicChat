@@ -21,15 +21,17 @@
 
 The public chat server is built on folder PublicChatServer.
 
-3) run the batch/shell script in PublicChatServer/ folder
+## Run Public Chat
+
+1) run the batch/shell script in PublicChatServer/ folder
 	* [Windows]: Click on the run.bat
 	* [Linux]: Type *sh run.sh* in a terminal
 
-4) You can also run the jar by yourself, using:
+2) You can also run the jar by yourself, using:
 	* java -Xmx1g -jar PublicChat **\<port>**
 		* where **\<port>** is a number, that defines the port 
 		
-5) Open browser at  **\<IP>**:**\<port>**/PublicChat
+3) Open browser at  **\<IP>**:**\<port>**/PublicChat
 	* eg: 192.168.1.6:8080/PublicChat
 	* eg: localhost:8000/PublicChat 
 
