@@ -13,7 +13,7 @@
 
 2) Run install/install.bat[sh]:
     * [Windows]: Click on bat file
-    * [Linux]: cd sh install/install.sh
+    * [Linux]: sh install/install.sh
 
    Or go to PublicChat folder with the **pom.xml** file and run maven clean install:
 	* cd PublicChat/PublicChat/
