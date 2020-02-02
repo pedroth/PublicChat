@@ -28,7 +28,7 @@ The public chat server is built on folder PublicChatServer.
 	* [Linux]: Type `sh run.sh` in a terminal
 
 2) You can also run the jar by yourself, using:
-	* `java -Xmx1g -jar PublicChat **\<port>**`
+	* `java -Xmx1g -jar PublicChat <port>`
 		* where **\<port>** is a number, that defines the port 
 		
 3) Open browser at  **\<IP>**:**\<port>**/PublicChat
