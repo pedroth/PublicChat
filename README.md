@@ -13,11 +13,11 @@
 
 2) Run install/install.bat[sh]:
     * [Windows]: Click on bat file
-    * [Linux]: sh install/install.sh
+    * [Linux]: `sh install/install.sh`
 
    Or go to PublicChat folder with the **pom.xml** file and run maven clean install:
-	* cd PublicChat/PublicChat/
-	* mvn clean install
+	* `cd PublicChat/PublicChat/`
+	* `mvn clean install`
 
 The public chat server is built on folder PublicChatServer.
 
@@ -25,10 +25,10 @@ The public chat server is built on folder PublicChatServer.
 
 1) run the batch/shell script in PublicChatServer/ folder
 	* [Windows]: Click on the run.bat
-	* [Linux]: Type *sh run.sh* in a terminal
+	* [Linux]: Type `sh run.sh` in a terminal
 
 2) You can also run the jar by yourself, using:
-	* java -Xmx1g -jar PublicChat **\<port>**
+	* `java -Xmx1g -jar PublicChat **\<port>**`
 		* where **\<port>** is a number, that defines the port 
 		
 3) Open browser at  **\<IP>**:**\<port>**/PublicChat
