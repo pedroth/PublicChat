@@ -1,2 +1,2 @@
-cd ../PublicChat
+cd PublicChat
 mvn clean install
