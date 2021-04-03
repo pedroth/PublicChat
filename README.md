@@ -10,7 +10,7 @@
 
 1) git clone the project
 	* git clone https://github.com/pedroth/PublicChat.git
-	* cd PublicChat
+	* `cd PublicChat`
 
 2) Run install/install.bat[sh]:
     * [Windows]: Click on bat file
