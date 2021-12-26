@@ -10,7 +10,7 @@ Public chat is a simple chat server that has the option to delete all data.
 
 ## Running PublicChat
 
-The proper way to run public chat, is to use docker:
+The proper way to run public chat, is to use [docker](https://docs.docker.com/get-docker/):
 
 `docker run -it -p 8080:8080 --name public-chat pedroth/public-chat`
 
