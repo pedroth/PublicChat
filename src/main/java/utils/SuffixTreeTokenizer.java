@@ -17,37 +17,10 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
         root = new Node("root");
     }
 
-    /**
-     * ---------------------------------
-     **/
-
-    public static void main(String args[]) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String[] s = {"x", "exp", "gauss", "euler", "pedro", "sin", "cos",
-                "ln", "sinh", "cosh", "tanh", "acos", "asin", "acosh", "asinh",
-                "she", "hers"};
-        SuffixTreeTokenizer st = new SuffixTreeTokenizer(s);
-        st.init();
-        st.printStateMachine(st.root);
-        String line = null;
-        try {
-            line = in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String[] tokens = st.tokenize(line);
-        for (int i = 0; i < tokens.length; i++) {
-            System.out.println(tokens[i]);
-        }
-    }
-
     public void init() {
         String[] p = this.getPatterns();
-        int psize = p.length;
-        for (int i = 0; i < psize; i++)
-            ConstructDSM(p[i], root);
+        for (String s : p) ConstructDSM(s, root);
         ConstructFailFunction();
-//        printStateMachine(root);
     }
 
     private void ConstructDSM(String pattern, Node n) {
@@ -74,12 +47,11 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
     private void buildFailFunction(Node n) {
         String[] p = this.getPatterns();
         Node oldState = n;
-        int psize = p.length;
         StringBuilder stack = new StringBuilder();
-        for (int j = 0; j < psize; j++) {
-            int strSize = p[j].length();
+        for (String s : p) {
+            int strSize = s.length();
             for (int k = 0; k < strSize; k++) {
-                Character aux = p[j].charAt(k);
+                Character aux = s.charAt(k);
                 stack.append(aux);
                 if (n.get(aux) != null) {
                     n = n.get(aux);
@@ -122,8 +94,7 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
                 state = root;
             }
         }
-        if (state.isFinalState())
-            answer.add(state.getToken());
+        if (state.isFinalState()) answer.add(state.getToken());
         return answer.toArray(new String[0]);
     }
 
@@ -146,11 +117,6 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
         return Optional.empty();
     }
 
-
-    /** --------------------------------- **/
-    /**
-     * debug stuff
-     */
     public void printStateMachine(Node n) {
         HashSet<Node> visited = new HashSet<>();
         Stack<Integer> level = new Stack<>();
@@ -191,11 +157,6 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
         }
     }
 
-    /**
-     * class Node, it has a map <Char,Node>
-     *
-     * @author pedro
-     */
     class Node {
         private Map<Character, Node> map;
         private Map<Character, Node> failFunction;
@@ -259,4 +220,21 @@ public class SuffixTreeTokenizer extends TokenRecognizer {
         }
     }
 
+
+    public static void main(String args[]) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        String[] s = {"x", "exp", "gauss", "euler", "pedro", "sin", "cos", "ln", "sinh", "cosh", "tanh", "acos", "asin", "acosh", "asinh", "she", "hers"};
+        SuffixTreeTokenizer st = new SuffixTreeTokenizer(s);
+        st.init();
+        st.printStateMachine(st.root);
+        try {
+            String line = in.readLine();
+            String[] tokens = st.tokenize(line);
+            for (String token : tokens) {
+                System.out.println(token);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

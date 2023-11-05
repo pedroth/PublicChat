@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,13 +23,15 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public class PublicChatServer {
-    private final static String HOME_ADDRESS = "resources/";
+    private final static String HOME_ADDRESS = "web/";
     private final static String DATA_ADDRESS = HOME_ADDRESS + "data/";
     // time in seconds
     private final static double TIMEOUT = 10;
     private final int serverPort;
     private List<UnitLog> logList = new ArrayList<>();
     private Map<String, Double> uID2TimeMap = new ConcurrentHashMap<>();
+
+    private HashSet<String> uploadFiles = new HashSet<>();
     private StopWatch stopWatch;
 
     PublicChatServer(int serverPort) {
@@ -66,36 +69,36 @@ public class PublicChatServer {
         }, 0, 1000, TimeUnit.MILLISECONDS);
         try {
             InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverPort);
-            log.info("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort + "/PublicChat");
+            log.info("Start public chat server at : http://" + InetAddress.getLocalHost().getHostAddress() + ":" + this.serverPort);
 
             HttpServer httpServer = HttpServer.create(inetSocketAddress, 0);
             createServices(httpServer);
             httpServer.setExecutor(Executors.newCachedThreadPool());
             httpServer.start();
         } catch (IOException e) {
-            log.debug("Exception Caught:", e);
+            log.error("Exception Caught:", e);
         }
     }
 
     private void createServices(HttpServer httpServer) {
-        httpServer.createContext("/PublicChat", httpExchange -> {
+        httpServer.createContext("/", httpExchange -> {
             try {
                 printClientData(httpExchange);
                 String file = parseGetInput(httpExchange.getRequestURI().toString());
-                if ("/PublicChat".equals(file)) {
-                    file = "PublicChat.html";
+                if ("/".equals(file)) {
+                    file = "index.html";
                     JServerUtils.respondWithTextFile(httpExchange, HOME_ADDRESS + file);
                 } else {
                     JServerUtils.respondWithBytes(httpExchange, HOME_ADDRESS + file);
                 }
             } catch (IOException e) {
+                log.error("Caught exception", e);
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
 
         httpServer.createContext("/chat", httpExchange -> {
             try {
-                printClientData(httpExchange);
                 TextIO textIO = new TextIO();
                 textIO.read(httpExchange.getRequestBody());
                 String text = textIO.getText();
@@ -103,61 +106,54 @@ public class PublicChatServer {
                     throw new RuntimeException("Empty String");
                 }
                 Map<String, String> stringMap = JServerUtils.parsePostMessage(text);
-                for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    log.info(entry.getKey() + " : " + entry.getValue());
-                }
                 String id = stringMap.get("id");
                 putClientInMap(id);
                 String jsonAns = getLogInfo(Integer.valueOf(stringMap.get("index").replaceAll("\n", "")));
-                log.info(jsonAns);
                 JServerUtils.respondWithText(httpExchange, jsonAns);
             } catch (Exception e) {
+                log.error("Caught exception", e);
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
 
         httpServer.createContext("/putText", httpExchange -> {
             try {
-                printClientData(httpExchange);
-
                 TextIO textIO = new TextIO();
                 textIO.read(httpExchange.getRequestBody());
                 Map<String, String> stringMap = JServerUtils.parsePostMessageUnformatted(textIO.getText());
-                for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    log.info(entry.getKey() + " : " + entry.getValue());
-                }
                 String id = stringMap.get("id");
                 putClientInMap(id);
                 this.logList.add(new UnitLog(id, stringMap.get("log")));
                 JServerUtils.respondWithText(httpExchange, "OK");
             } catch (Exception e) {
+                log.error("Caught exception", e);
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
 
         httpServer.createContext("/clear", httpExchange -> {
             try {
-                printClientData(httpExchange);
                 TextIO textIO = new TextIO();
                 textIO.read(httpExchange.getRequestBody());
                 Map<String, String> stringMap = JServerUtils.parsePostMessage(textIO.getText());
-                for (Map.Entry<String, String> entry : stringMap.entrySet()) {
-                    log.info(entry.getKey() + " : " + entry.getValue());
-                }
                 this.logList.removeAll(this.logList);
+                this.uploadFiles.removeAll(this.uploadFiles);
                 removeData();
+                log.info("Server data was cleared!");
                 JServerUtils.respondWithText(httpExchange, "OK");
             } catch (Exception e) {
+                log.error("Caught exception", e);
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
 
         httpServer.createContext("/upload", httpExchange -> {
             try {
-                printClientData(httpExchange);
                 String fileName = uploadFile(httpExchange);
+                uploadFiles.add(fileName);
                 JServerUtils.respondWithText(httpExchange, fileName);
             } catch (Exception e) {
+                log.error("Caught exception", e);
                 JServerUtils.respondWithText(httpExchange, "<p>" + getTraceError(e) + "<p>");
             }
         });
@@ -182,7 +178,7 @@ public class PublicChatServer {
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(DATA_ADDRESS + fileName))) {
             StopWatch stopWatch = new StopWatch();
             smUpload.getData().forEach(ConsumerWithException.wrap(outputStream::write));
-            log.info("<<<<<  " + stopWatch.getEleapsedTime() + "  >>>>>");
+            log.info("File uploaded in: " + stopWatch.getEleapsedTime() + "s");
         }
         return fileName;
     }

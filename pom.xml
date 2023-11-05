@@ -15,17 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
-            <scope>provided</scope>
+            <version>1.18.30</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -34,20 +26,38 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
         </dependency>
-             
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
-        </dependency>     
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version> <!-- Use the version appropriate for your project -->
+
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/PublicChatServer
+                            </directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${project.basedir}/logs
+                            </directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -61,7 +71,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../PublicChatServer</outputDirectory>
+                            <outputDirectory>./PublicChatServer</outputDirectory>
                             <finalName>PublicChat</finalName>
                             <transformers>
                                 <!-- add Main-Class to manifest file -->
@@ -86,10 +96,10 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../PublicChatServer/resources</outputDirectory>
+                            <outputDirectory>./PublicChatServer/web</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>resources</directory>
+                                    <directory>web</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -102,10 +112,13 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../PublicChatServer/</outputDirectory>
+                            <outputDirectory>./PublicChatServer/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>scripts</directory>
+                                    <excludes>
+                                        <exclude>install.*</exclude> <!-- Exclude files matching the pattern -->
+                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>

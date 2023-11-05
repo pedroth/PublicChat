@@ -7,7 +7,7 @@ RUN git clone https://github.com/pedroth/PublicChat.git
 FROM maven:3.5-jdk-8-alpine as build 
 WORKDIR /app
 COPY --from=clone /app/PublicChat/ /app
-RUN sh install/install.sh
+RUN sh scripts/install.sh
 
 FROM openjdk:8-jre-alpine
 WORKDIR /app
