@@ -5,7 +5,7 @@ public class StateMachine<I> {
     private State<I> state;
 
     public StateMachine(State<I> initialState) {
-        this.state = state;
+        this.state = initialState;
     }
 
     public void next(I x) {
