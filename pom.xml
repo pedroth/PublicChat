@@ -51,6 +51,10 @@
                             <directory>${project.basedir}/logs
                             </directory>
                         </fileset>
+                        <fileset>
+                            <directory>${project.basedir}/web/data
+                            </directory>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
