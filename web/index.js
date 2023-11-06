@@ -272,7 +272,7 @@ Upload.prototype.doUpload = function () {
             return myXhr;
         },
         success: function (data) {
-            $("#input").val(window.location.href + "/data/" + data);
+            $("#input").val(window.location.href + "data/" + data);
             // your callback here
             console.log("Data uploaded " + data);
         },
