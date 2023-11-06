@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class PublicChatServer {
     private final static String HOME_ADDRESS = "web/";
-    private final static String DATA_ADDRESS = HOME_ADDRESS + "data/";
+    private final static String DATA_ADDRESS = HOME_ADDRESS + "data";
     // time in seconds
     private final static double TIMEOUT = 10;
     private final int serverPort;
