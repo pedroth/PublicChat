@@ -18,12 +18,17 @@ Or just run `dockerRun.sh`:
 
 - `sh dockerRun.sh`
 
+## Running PublicChat on RaspberryPi
+Since RaspberryPi usually have a `arm` processor, a new version of the docker images needs to be used.
+
+`docker run -it -p 80:8080 --name public-chat pedroth/public-chat:linux-arm-v6`
+
 ## Installing public chat on your machine
 
 Follow the steps of [Dockerfile](/Dockerfile).
 
 ## Demo
 
-A public instance of the public chat is [here](http://pedroth.duckdns.org:8080/PublicChat).
+A public instance of the public chat is [here](http://pedroth.duckdns.org).
 
 Most of the time is offline...
