@@ -2,6 +2,7 @@ package chat;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import exception.PublicChatRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import utils.*;
 
@@ -11,6 +12,8 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -103,7 +106,7 @@ public class PublicChatServer {
                 textIO.read(httpExchange.getRequestBody());
                 String text = textIO.getText();
                 if ("".equals(text)) {
-                    throw new RuntimeException("Empty String");
+                    throw new PublicChatRuntimeException("Empty String");
                 }
                 Map<String, String> stringMap = JServerUtils.parsePostMessage(text);
                 String id = stringMap.get("id");
@@ -165,6 +168,7 @@ public class PublicChatServer {
 
     private String uploadFile(HttpExchange he) throws IOException {
         int readByte;
+        StopWatch stopWatch = new StopWatch();
         final InputStream requestBody = he.getRequestBody();
         SMUpload smUpload = new SMUpload();
         while ((readByte = requestBody.read()) != -1) {
@@ -172,11 +176,10 @@ public class PublicChatServer {
         }
         String fileName = smUpload.getFileName();
 
-        if (fileName == null) throw new RuntimeException("No file name");
+        if (fileName == null) throw new PublicChatRuntimeException("No file name");
 
         FilesCrawler.createDirs(DATA_ADDRESS);
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(DATA_ADDRESS + fileName))) {
-            StopWatch stopWatch = new StopWatch();
+        try (OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(Paths.get(DATA_ADDRESS + fileName)))) {
             smUpload.getData().forEach(ConsumerWithException.wrap(outputStream::write));
             log.info("File uploaded in: " + stopWatch.getEleapsedTime() + "s");
         }

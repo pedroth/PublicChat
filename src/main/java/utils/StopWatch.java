@@ -19,7 +19,7 @@ public class StopWatch {
      * @return the eleapsed time
      */
     public double getEleapsedTime() {
-        return (System.nanoTime() - time) / 1E9;
+        return (System.nanoTime() - time) * 1E-9;
     }
 
     /**

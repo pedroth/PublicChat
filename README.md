@@ -24,6 +24,6 @@ Follow the steps of [Dockerfile](/Dockerfile).
 
 ## Demo
 
-A public instance of the public chat is [here](http://pedroth.duckdns.org:8080/PublicChat).
+A public instance of the public chat is [here](http://pedroth.duckdns.org).
 
 Most of the time is offline...

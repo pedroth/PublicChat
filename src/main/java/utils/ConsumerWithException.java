@@ -1,5 +1,7 @@
 package utils;
 
+import exception.PublicChatRuntimeException;
+
 import java.util.function.Consumer;
 
 public interface ConsumerWithException<T> {
@@ -11,7 +13,7 @@ public interface ConsumerWithException<T> {
           try {
               consumer.accept(x);
           }catch (Exception e) {
-              throw new RuntimeException(e);
+              throw new PublicChatRuntimeException(e);
           }
         };
     }
