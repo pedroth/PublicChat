@@ -23,11 +23,11 @@ class SMUpload {
     };
 
     private State<Integer> stateFour = new State<Integer>() {
-        final String regex = "------WebKitFormBoundary";
+        final String uploadHeader = "------WebKitFormBoundary";
         private SuffixTreeTokenizer tokenizer;
 
         {
-            tokenizer = new SuffixTreeTokenizer(new String[]{regex});
+            tokenizer = new SuffixTreeTokenizer(new String[]{uploadHeader});
             tokenizer.init();
         }
 
@@ -35,8 +35,8 @@ class SMUpload {
         public State<Integer> next(Integer x) {
             final Optional<String> token = tokenizer.next((char) x.intValue());
             if (token.isPresent()) {
-                index = index - regex.length() + 1;
-                IntStream.range(0, regex.length() + 1).forEach(v -> data.pollLast());
+                index = index - uploadHeader.length() + 1;
+                IntStream.range(0, uploadHeader.length() + 1).forEach(v -> data.pollLast());
                 return stateFive;
             }
             data.add(x);
@@ -99,10 +99,6 @@ class SMUpload {
 
     String getFileName() {
         return fileName;
-    }
-
-    int getIndex() {
-        return index;
     }
 
     List<Integer> getData() {

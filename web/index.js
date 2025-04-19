@@ -1,21 +1,21 @@
-var NameGenerator = function() {
+const NameGenerator = function() {
     this.alphabet = "abcdefghijklmnopqrstuvwxyz";
 
     this.randomInt = (min, max) => {
-        let diff = max  -  min;
+        const diff = max - min;
         return Math.floor(min + Math.random() * diff);
     }
 
     this.powInt = (x, n) => {
-      if(n == 0) return 1;
-      if(n == 1) return x;
-      // n > 1
-      var q = Math.floor(n / 2);
-      var r = n % 2;
-      if(r == 0)
-        return this.powInt(x * x, q);
-      else
-        return x * this.powInt(x * x, q);
+        if(n == 0) return 1;
+        if(n == 1) return x;
+        // n > 1
+        const q = Math.floor(n / 2);
+        const r = n % 2;
+        if(r == 0)
+            return this.powInt(x * x, q);
+        else
+            return x * this.powInt(x * x, q);
     }
 
     // n must be in [0, ..., this.alphabet.length - 1]
@@ -24,8 +24,8 @@ var NameGenerator = function() {
     }
 
     this.coding = n => {
-        var code = [];
-        let b = this.alphabet.length;
+        let code = [];
+        const b = this.alphabet.length;
         while(n > 0) {
             code.push(n % b);
             n = Math.floor(n / b);
@@ -34,11 +34,11 @@ var NameGenerator = function() {
     }
 
     this.generateName = () => {
-        let randInt = this.randomInt(0,18);
-        let nameNumber = Math.floor(this.powInt(10, randInt) * Math.random());
-        let n = this.alphabet.length;
-        let remainderArray = this.coding(nameNumber);
-        var strBuilder = [];
+        const randInt = this.randomInt(0,18);
+        const nameNumber = Math.floor(this.powInt(10, randInt) * Math.random());
+        const n = this.alphabet.length;
+        const remainderArray = this.coding(nameNumber);
+        let strBuilder = [];
         for(let i = 0; i < remainderArray.length; i++) {
             strBuilder.push(this.number2Alpha(remainderArray[remainderArray.length - i - 1]));
         }
@@ -46,29 +46,28 @@ var NameGenerator = function() {
     }
 }
 
-var uID = new NameGenerator().generateName();
+let uID = new NameGenerator().generateName();
 
-var isFirstTime = true;
-var oldIndex = -1
-var index = -1;
+let isFirstTime = true;
+let oldIndex = -1;
+let index = -1;
 
-var timeOutTime = 100;
-var missedNotifications = 0;
+let timeOutTime = 100;
+let missedNotifications = 0;
 
-var startTime = new Date().getTime();
-var time = 0;
+let startTime = new Date().getTime();
+let time = 0;
 
 function toggleNav() {
-    if($("#burger").attr("isOn") == "true") {
-        document.getElementById("mySidenav").style.width = "0";
-        document.getElementById("main").style.marginLeft= "0";
-        $("#burger").html("&#9776;")
-        $("#burger").attr("isOn", "false");
+    const sidenav = document.getElementById("mySidenav");
+    const main = document.getElementById("main");
+
+    if (sidenav.classList.contains("open")) {
+        sidenav.classList.remove("open");
+        main.style.marginLeft = "0";
     } else {
-        document.getElementById("mySidenav").style.width = "250px";
-        document.getElementById("main").style.marginLeft = "250px";
-        $("#burger").html("&times;");
-        $("#burger").attr("isOn", "true");
+        sidenav.classList.add("open");
+        main.style.marginLeft = "280px";
     }
 }
 
@@ -83,29 +82,19 @@ function isChrome() {
 function hideIfMobile() {
     if(isPhone()) {
         $("#shiftPlusEnterP").hide();
-    }else {
+    } else {
         $("#send").hide();
     }
 }
 
-function htmlEncode(value) {
-    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-    //then grab the encoded contents back out.  The div never exists on the page.
-    return $('<div/>').text(value).html();
-}
-
-function htmlDecode(value) {
-    return $('<div/>').html(value).text();
-}
-
 function generateNotification(title, text) {
-    var notification = new Notification(title, { body: text});
+    const notification = new Notification(title, { body: text });
 }
 
 function optimizePulling() {
-    var timeOutTimeBase = 100;
-    var pullingLimitTime = 1000;
-    var dt = 1E-3 * (new Date().getTime() - startTime);
+    const timeOutTimeBase = 100;
+    const pullingLimitTime = 1000;
+    const dt = 1E-3 * (new Date().getTime() - startTime);
     startTime = new Date().getTime();
     time += dt;
     timeOutTime = index - oldIndex > 0 ? timeOutTimeBase : timeOutTime + 5;
@@ -113,11 +102,11 @@ function optimizePulling() {
 }
 
 function scrollDown() {
-    $("#chat").scrollTop( $("#chat").prop("scrollHeight"));
+    $("#chat").scrollTop($("#chat").prop("scrollHeight"));
 }
 
 function isEndChat() {
-    let chat = $("#chat");
+    const chat = $("#chat");
     return chat.prop("scrollTop") + chat.prop("offsetHeight") == chat.prop("scrollHeight");
 }
 
@@ -127,13 +116,13 @@ function optimizeScroll(isEndChat) {
         isFirstTime = false;
         return;
     }
-    if(isEndChat){
+    if(isEndChat) {
         missedNotifications = 0;
         $("#chatHeader").html(`Chat:`);
         document.title = `PublicChat`;
         scrollDown();
     } else {
-        let diffLog = index - oldIndex;
+        const diffLog = index - oldIndex;
         missedNotifications += diffLog;
         $("#chatHeader").html(`Chat:<a onclick=scrollDown()>Scroll down${missedNotifications == 0 ? "" : `(${missedNotifications})`} <i class="fas fa-chevron-down"></i></a>`);
         document.title = `(${missedNotifications})PublicChat`;
@@ -146,68 +135,124 @@ function optimizeNotification(id, text) {
     }
 }
 
-function getChat() {
-    $.ajax({
-        method:"POST",
-        url:"/chat",
-        data: {
-           id : uID,
-           index : index
-        },
-        success: function(result) {
-            var pattern = new RegExp('^(https?:\/\/)');
-            var chat = JSON.parse(result);
-            if(chat.needClean) {
-                $("#chat").empty();
-                index = -1;
-            } else {
-                $("#numberOfUsers").html(chat.users.length);
-                $("#userNames").empty()
-                for(var i = 0; i < chat.users.length; i++) {
-                    $("#userNames").append("<li>" + chat.users[i] + "</li>");
-                }
-                let endChat = isEndChat();
-                for(var i = 0; i < chat.log.length; i++) {
-                    // replace new line in http (%0A) by new line in HTML (<br />) then  decode http and replace spaces in http(+) by a space char
-                    var text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g,  " ");
-                    var id = decodeURIComponent(chat.log[i].id);
-                    var split = text.split("<br />");
-                    split.forEach(t => {
-                        if(pattern.test(t)) {
-                            $("#chat").append(`<p> ${id} > <a target='_blank' href='${htmlEncode(t)}' > ${t} </a></p>`);
-                        } else {
-                            $("#chat").append("<p>" + id + " > " + htmlEncode(t) + "</p>")
-                        }
-                    });
-                    optimizeNotification(id, text);
-                }
-                optimizeScroll(endChat);
-                oldIndex = index;
-                index += chat.log.length;
-            }
-            optimizePulling();
-            setTimeout(getChat, timeOutTime);
-        }
-    });
+function ajaxSerialize(obj) {
+    return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("&")
 }
 
-function sendText() {
-    var text = $("#input").val();
-    //send request to server
-    $.ajax({
-            method:"POST",
-            url:"/putText",
-            data: {
-               id : uID,
-               log : text
+function hasImageFileType(str) {
+    const pattern = /\.(jpg|jpeg|png|gif|webp|svg|ico|bmp|avif|heic|heif)$/i;
+    return pattern.test(str);
+}
+
+function hasVideoFileType(str) {
+    const pattern = /\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv|mpeg)$/i;
+    return pattern.test(str);
+}
+
+function hasAudioFileType(str) {
+    const pattern = /\.(mp3|wav|ogg|m4a|aac|flac|wma|opus)$/i;
+    return pattern.test(str);
+}
+
+function isYouTubeVideoUrl(str) {
+    const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}/i;
+    return pattern.test(str);
+}
+
+async function previewLink(linkArray) {
+    if(linkArray.length === 0) return ``;
+    const link = decodeURIComponent(linkArray[0]);
+    if(hasImageFileType(link)) return `<img src="${link}"></img>`
+    if(hasAudioFileType(link)) {
+        const response = await fetch(link);
+        const audioBytes = await response.arrayBuffer();
+        const blob = new Blob([audioBytes], { type: link.split(".").at(-1) });
+        const audioUrl = URL.createObjectURL(blob);
+        return `<audio src="${audioUrl}" controls style="height: 50px"></audio>`
+    }
+    if(hasVideoFileType(link)) {
+        const response = await fetch(link);
+        const videoBytes = await response.arrayBuffer();
+        const blob = new Blob([videoBytes], { type: link.split(".").at(-1) });
+        const videoUrl = URL.createObjectURL(blob);
+        return `<video src="${videoUrl}" controls ></video>`
+    }
+    if(isYouTubeVideoUrl(link)) {
+        // Extract video ID
+        const videoId = link.match(/[a-zA-Z0-9_-]{11}/)[0];
+        return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    }
+    return ''
+}
+
+async function getChat() {
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
             },
-            success: function(result) {
-                if("OK" === result) {
-                    $("#input").val("");
-                }
-            }
+            body: ajaxSerialize({
+                id: uID,
+                index: index
+            })
         });
-    $( "#chat" ).scrollTop( $("#chat").prop("scrollHeight"));
+        const chat = await response.json();
+        const pattern = new RegExp('https?:\/\/');
+        if(chat.needClean) {
+            $("#chat").empty();
+            index = -1;
+        } else {
+            $("#numberOfUsers").html(chat.users.length);
+            $("#userNames").empty();
+            for(let i = 0; i < chat.users.length; i++) {
+                $("#userNames").append("<li>" + chat.users[i] + "</li>");
+            }
+            const endChat = isEndChat();
+            for(let i = 0; i < chat.log.length; i++) {
+                const text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g, " ");
+                const id = decodeURIComponent(chat.log[i].id);
+                const split = text.split("<br />");
+                split.forEach(async t => {
+                    const finalStr = t.split(" ").map(x => pattern.test(x) ? `<a target='_blank' href='${decodeURIComponent(x)}' > ${x} </a>` : x).join(" ")
+                    const linkArray = t.split(" ").filter(x => pattern.test(x));
+                    $("#chat").append(`<p> ${id} > ${finalStr} <div class="preview_media">${await previewLink(linkArray)}</div></p>`);
+                });
+                optimizeNotification(id, text);
+            }
+            optimizeScroll(endChat);
+            oldIndex = index;
+            index += chat.log.length;
+        }
+        optimizePulling();
+        setTimeout(getChat, timeOutTime);
+    } catch (error) {
+        console.error("Error fetching chat:", error);
+        setTimeout(getChat, timeOutTime);
+    }
+}
+
+async function sendText() {
+    const text = $("#input").val();
+    try {
+        const response = await fetch("/putText", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: ajaxSerialize({
+                id: uID,
+                log: encodeURIComponent(text)
+            })
+        });
+        const result = await response.text();
+        if(result === "OK") {
+            $("#input").val("");
+        }
+        $("#chat").scrollTop($("#chat").prop("scrollHeight"));
+    } catch (error) {
+        console.error("Error sending text:", error);
+    }
 }
 
 function inputKeyPress(event) {
@@ -217,93 +262,98 @@ function inputKeyPress(event) {
 }
 
 function inputKeyId(event) {
-    if("Enter" === event.key ) {
+    if("Enter" === event.key) {
         uID = $("#myIdIn").val();
     }
 }
 
-function clearServer() {
-        $.ajax({
-                method:"POST",
-                url:"/clear",
-                data: {
-                   id : uID
-                },
-                success: function(result) {
-                    if("OK" === result) {
-                        console.log("console clear");
-                    }
-                }
-            });
+async function clearServer() {
+    try {
+        const response = await fetch("/clear", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: ajaxSerialize({
+                id: uID
+            })
+        });
+        const result = await response.text();
+        if(result === "OK") {
+            console.log("console clear");
+        }
+    } catch (error) {
+        console.error("Error clearing server:", error);
+    }
 }
 
 // taken from https://stackoverflow.com/questions/2320069/jquery-ajax-file-upload answer by Ziinloader
-var Upload = function (file) {
-    this.file = file;
-};
-
-Upload.prototype.getType = function() {
-    return this.file.type;
-};
-Upload.prototype.getSize = function() {
-    return this.file.size;
-};
-Upload.prototype.getName = function() {
-    return this.file.name;
-};
-Upload.prototype.doUpload = function () {
-    var that = this;
-    var formData = new FormData();
-
-    // add assoc key values, this will be posts values
-    formData.append("file", this.file, this.getName());
-    formData.append("upload_file", true);
-
-    $.ajax({
-        type: "POST",
-        url: "/upload",
-        xhr: function () {
-            $("#progress-wrp").css("visibility", "visible");
-            $("#progress-wrp").slideDown();
-            var myXhr = $.ajaxSettings.xhr();
-            if (myXhr.upload) {
-                myXhr.upload.addEventListener('progress', that.progressHandling, false);
-            }
-            return myXhr;
-        },
-        success: function (data) {
-            $("#input").val(window.location.href + "data/" + data);
-            // your callback here
-            console.log("Data uploaded " + data);
-        },
-        error: function (error) {
-            // handle error
-        },
-        async: true,
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        timeout: 1E10
-    });
-};
-
-Upload.prototype.progressHandling = function (event) {
-    var percent = 0;
-    var position = event.loaded || event.position;
-    var total = event.total;
-    var progress_bar_id = "#progress-wrp";
-    if (event.lengthComputable) {
-        percent = Math.ceil(position / total * 100);
+class Upload {
+    constructor(file) {
+        this.file = file;
     }
-    // update progress bars classes so it fits your code
-    $(progress_bar_id + " .progress-bar").css("width", +percent + "%");
-    $(progress_bar_id + " .status").text(percent + "%");
 
-    if(percent == 100) {
-        $(progress_bar_id).slideUp();
+    getType() {
+        return this.file.type;
     }
-};
+
+    getSize() {
+        return this.file.size;
+    }
+
+    getName() {
+        return this.file.name;
+    }
+
+    doUpload() {
+        const formData = new FormData();
+        formData.append("file", this.file, this.getName());
+        formData.append("upload_file", true);
+
+        $.ajax({
+            type: "POST",
+            url: "/upload",
+            xhr: () => {
+                $("#progress-wrp").css("visibility", "visible");
+                $("#progress-wrp").slideDown();
+                const myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', (event) => this.progressHandling(event), false);
+                }
+                return myXhr;
+            },
+            success: (data) => {
+                $("#input").val(window.location.href + "data/" + data);
+                console.log("Data uploaded " + data);
+            },
+            error: (error) => {
+                // handle error
+            },
+            async: true,
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            timeout: 1E10
+        });
+    }
+
+    progressHandling(event) {
+        let percent = 0;
+        const position = event.loaded || event.position;
+        const total = event.total;
+        const progress_bar_id = "#progress-wrp";
+        if (event.lengthComputable) {
+            percent = Math.ceil(position / total * 100);
+        }
+        $(progress_bar_id + " .progress-bar").css("width", percent + "%");
+        $(progress_bar_id + " .status").text(percent + "%");
+
+        if (percent === 100) {
+            $(progress_bar_id).slideUp();
+        }
+    }
+}
 
 // init
 $("#clear").click(clearServer);
@@ -315,15 +365,33 @@ $("#burger").click(toggleNav);
 hideIfMobile();
 getChat();
 
-document.addEventListener('DOMContentLoaded', function () {
-  if (Notification.permission !== "granted")
-    Notification.requestPermission();
+document.addEventListener('DOMContentLoaded', function() {
+    if (Notification.permission !== "granted")
+        Notification.requestPermission();
 });
 
-$("#file").on("change", function (e) {
-    var file = $(this)[0].files[0];
-    var upload = new Upload(file);
-    // execute upload
-    upload.doUpload();
+// Drag and drop file handling
+$("#input").on("dragover", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).addClass('dragover');
 });
+
+$("#input").on("dragleave", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).removeClass('dragover');
+});
+
+$("#input").on("drop", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).removeClass('dragover');
+    const file = e.originalEvent.dataTransfer.files[0];
+    if (file) {
+        const upload = new Upload(file);
+        upload.doUpload();
+    }
+});
+
 $("#progress-wrp").css("visibility", "hidden");

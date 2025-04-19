@@ -1,65 +1,78 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.11.2/css/bootstrap-select.min.css">
-    <link rel="stylesheet" href="index.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.11.2/js/bootstrap-select.min.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PublicChat</title>
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
 </head>
 <body>
 
 <div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
-    <h4>Users</h4>
-    <div class="form-group">
-        <label>MyId : </label>
-        <input type="text" class="form-control" id="myIdIn" onkeypress="inputKeyId(event)">
-        <button type="button" class="btn btn-default" id="changeNameButton">Change ID</button>
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">×</a>
+    <div class="sidenav-content">
+        <h4>Users</h4>
+        <div class="form-group">
+            <label class="form-label" for="myIdIn">My ID:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="myIdIn" onkeypress="inputKeyId(event)">
+                <button class="btn btn-outline" type="button" id="changeNameButton">Change</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <span>Number of users: </span>
+            <span class="badge" id="numberOfUsers">0</span>
+        </div>
+        <h5>Online Users</h5>
+        <ul class="user-list" id="userNames"></ul>
     </div>
-    <div class="form-group">
-        <label>Number of users : </label>
-        <label id="numberOfUsers">0</label>
-    </div>
-    <ul class="nav nav-pills nav-stacked" id="userNames"></ul>
 </div>
 
 <div id="main">
     <div class="page-wrapper">
-        <div class="jumbotron">
-            <h1><span style="font-size:50px;cursor:pointer" id="burger" isOn="true">&#9776;</span>Public Chat</h1>
+        <div class="header">
+            <h1><i class="fas fa-bars" id="burger" isOn="true"></i> PublicChat</h1>
         </div>
-        <div>
-            <h4 id="chatHeader">Chat:</h4>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h5 id="chatHeader" class="chat-title">Chat Room</h5>
+            </div>
             <div id="chat"></div>
         </div>
-        <div>
-            <label> Input: </label>
-            <textarea class="form-control" rows="3" id="input" onkeypress="inputKeyPress(event)"></textarea>
-            <br>
-            <p id="shiftPlusEnterP">shift + Enter = new line</p>
-        </div>
-        <div id="send-clear-div">
-            <button type="button" class="btn btn-default" id="send">Send</button>
-            <button type="button" class="btn btn-default" id="clear">Clear Server</button>
-        </div>
-        <div >
-            <input type="file" id="file"/>
-            <div id="progress-wrp">
-                <div class="progress-bar"></div>
-                <div class="status">0%</div>
+
+        <div class="input-area">
+            <label for="input" class="form-label">Message (Drag and drop files here):</label>
+            <textarea class="form-control" id="input" onkeypress="inputKeyPress(event)" placeholder="Type your message or drag and drop a file here..."></textarea>
+            <small id="shiftPlusEnterP" class="text-muted">Shift + Enter for new line</small>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-primary" id="send">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+                <button type="button" class="btn btn-outline" id="clear">
+                    <i class="fas fa-trash-alt"></i> Clear
+                </button>
             </div>
         </div>
+
+        <div id="progress-wrp">
+            <div class="progress-bar"></div>
+            <div class="status">0%</div>
+        </div>
     </div>
+
     <footer class="site-footer">
-        <a target='_blank' href="https://github.com/pedroth/publicChat"><p>Code</p></a>
+        <a target='_blank' href="https://github.com/pedroth/publicChat">
+            <i class="fab fa-github"></i> View Source Code
+        </a>
     </footer>
 </div>
+
+<!-- Only jQuery for basic compatibility -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="index.js"></script>
 </body>
 </html>
-
-

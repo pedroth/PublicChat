@@ -87,8 +87,8 @@ public final class JServerUtils {
         request = request.substring(0, request.length() - 1);
         Map<String, String> ans = new HashMap<>();
         String[] split = request.split("&");
-        for (int i = 0; i < split.length; i++) {
-            String[] split1 = split[i].split("=");
+        for (String s : split) {
+            String[] split1 = s.split("=");
             String key = split1[0];
             String value = split1[1];
             ans.put(key, value);
