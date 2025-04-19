@@ -87,16 +87,6 @@ function hideIfMobile() {
     }
 }
 
-function htmlEncode(value) {
-    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-    //then grab the encoded contents back out.  The div never exists on the page.
-    return $('<div/>').text(value).html();
-}
-
-function htmlDecode(value) {
-    return $('<div/>').html(value).text();
-}
-
 function generateNotification(title, text) {
     const notification = new Notification(title, { body: text });
 }
@@ -149,6 +139,52 @@ function ajaxSerialize(obj) {
     return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("&")
 }
 
+function hasImageFileType(str) {
+    const pattern = /\.(jpg|jpeg|png|gif|webp|svg|ico|bmp|avif|heic|heif)$/i;
+    return pattern.test(str);
+}
+
+function hasVideoFileType(str) {
+    const pattern = /\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv|mpeg)$/i;
+    return pattern.test(str);
+}
+
+function hasAudioFileType(str) {
+    const pattern = /\.(mp3|wav|ogg|m4a|aac|flac|wma|opus)$/i;
+    return pattern.test(str);
+}
+
+function isYouTubeVideoUrl(str) {
+    const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}/i;
+    return pattern.test(str);
+}
+
+async function previewLink(linkArray) {
+    if(linkArray.length === 0) return ``;
+    const link = decodeURIComponent(linkArray[0]);
+    if(hasImageFileType(link)) return `<img src="${link}"></img>`
+    if(hasAudioFileType(link)) {
+        const response = await fetch(link);
+        const audioBytes = await response.arrayBuffer();
+        const blob = new Blob([audioBytes], { type: link.split(".").at(-1) });
+        const audioUrl = URL.createObjectURL(blob);
+        return `<audio src="${audioUrl}" controls style="height: 50px"></audio>`
+    }
+    if(hasVideoFileType(link)) {
+        const response = await fetch(link);
+        const videoBytes = await response.arrayBuffer();
+        const blob = new Blob([videoBytes], { type: link.split(".").at(-1) });
+        const videoUrl = URL.createObjectURL(blob);
+        return `<video src="${videoUrl}" controls ></video>`
+    }
+    if(isYouTubeVideoUrl(link)) {
+        // Extract video ID
+        const videoId = link.match(/[a-zA-Z0-9_-]{11}/)[0];
+        return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    }
+    return ''
+}
+
 async function getChat() {
     try {
         const response = await fetch("/chat", {
@@ -162,7 +198,7 @@ async function getChat() {
             })
         });
         const chat = await response.json();
-        const pattern = new RegExp('^(https?:\/\/)');
+        const pattern = new RegExp('https?:\/\/');
         if(chat.needClean) {
             $("#chat").empty();
             index = -1;
@@ -177,12 +213,10 @@ async function getChat() {
                 const text = decodeURIComponent(chat.log[i].text.replace(new RegExp("%0A", "g"),"<br />")).replace(/\+/g, " ");
                 const id = decodeURIComponent(chat.log[i].id);
                 const split = text.split("<br />");
-                split.forEach(t => {
-                    if(pattern.test(t)) {
-                        $("#chat").append(`<p> ${id} > <a target='_blank' href='${htmlEncode(t)}' > ${t} </a></p>`);
-                    } else {
-                        $("#chat").append("<p>" + id + " > " + htmlEncode(t) + "</p>");
-                    }
+                split.forEach(async t => {
+                    const finalStr = t.split(" ").map(x => pattern.test(x) ? `<a target='_blank' href='${decodeURIComponent(x)}' > ${x} </a>` : x).join(" ")
+                    const linkArray = t.split(" ").filter(x => pattern.test(x));
+                    $("#chat").append(`<p> ${id} > ${finalStr} <div class="preview_media">${await previewLink(linkArray)}</div></p>`);
                 });
                 optimizeNotification(id, text);
             }
@@ -208,7 +242,7 @@ async function sendText() {
             },
             body: ajaxSerialize({
                 id: uID,
-                log: text
+                log: encodeURIComponent(text)
             })
         });
         const result = await response.text();
@@ -253,59 +287,73 @@ async function clearServer() {
     }
 }
 
-const Upload = function(file) {
-    this.file = file;
-};
+// taken from https://stackoverflow.com/questions/2320069/jquery-ajax-file-upload answer by Ziinloader
+class Upload {
+    constructor(file) {
+        this.file = file;
+    }
 
-Upload.prototype.getType = function() {
-    return this.file.type;
-};
-Upload.prototype.getSize = function() {
-    return this.file.size;
-};
-Upload.prototype.getName = function() {
-    return this.file.name;
-};
-Upload.prototype.doUpload = async function() {
-    const that = this;
-    const formData = new FormData();
-    formData.append("file", this.file, this.getName());
-    formData.append("upload_file", true);
+    getType() {
+        return this.file.type;
+    }
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1E10);
-        const response = await fetch("/upload", {
-            method: "POST",
-            body: formData,
-            signal: controller.signal
+    getSize() {
+        return this.file.size;
+    }
+
+    getName() {
+        return this.file.name;
+    }
+
+    doUpload() {
+        const formData = new FormData();
+        formData.append("file", this.file, this.getName());
+        formData.append("upload_file", true);
+
+        $.ajax({
+            type: "POST",
+            url: "/upload",
+            xhr: () => {
+                $("#progress-wrp").css("visibility", "visible");
+                $("#progress-wrp").slideDown();
+                const myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', (event) => this.progressHandling(event), false);
+                }
+                return myXhr;
+            },
+            success: (data) => {
+                $("#input").val(window.location.href + "data/" + data);
+                console.log("Data uploaded " + data);
+            },
+            error: (error) => {
+                // handle error
+            },
+            async: true,
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            timeout: 1E10
         });
-        clearTimeout(timeoutId);
-        const data = await response.text();
-        $("#input").val(window.location.href + "data/" + data);
-        console.log("Data uploaded " + data);
-    } catch (error) {
-        console.error("Error uploading file:", error);
-    } finally {
-        $("#progress-wrp").slideUp();
     }
-};
 
-Upload.prototype.progressHandling = function(event) {
-    let percent = 0;
-    const position = event.loaded || event.position;
-    const total = event.total;
-    const progress_bar_id = "#progress-wrp";
-    if (event.lengthComputable) {
-        percent = Math.ceil(position / total * 100);
-    }
-    $(progress_bar_id + " .progress-bar").css("width", +percent + "%");
-    $(progress_bar_id + " .status").text(percent + "%");
+    progressHandling(event) {
+        let percent = 0;
+        const position = event.loaded || event.position;
+        const total = event.total;
+        const progress_bar_id = "#progress-wrp";
+        if (event.lengthComputable) {
+            percent = Math.ceil(position / total * 100);
+        }
+        $(progress_bar_id + " .progress-bar").css("width", percent + "%");
+        $(progress_bar_id + " .status").text(percent + "%");
 
-    if(percent == 100) {
-        $(progress_bar_id).slideUp();
+        if (percent === 100) {
+            $(progress_bar_id).slideUp();
+        }
     }
-};
+}
 
 // init
 $("#clear").click(clearServer);
