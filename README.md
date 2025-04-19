@@ -2,6 +2,8 @@
 
 Public chat is a simple chat server that has the option to delete all data.
 
+![Public chat](/PublicChatv1.gif)
+
 ## Features
 - Send text messages through web
 - Upload files
