@@ -4,7 +4,7 @@ FROM alpine/git as clone
 WORKDIR /app
 RUN git clone https://github.com/pedroth/PublicChat.git
 
-FROM maven:3.5-jdk-8-alpine as build 
+FROM maven:3.5-jdk-11-alpine as build
 WORKDIR /app
 COPY --from=clone /app/PublicChat/ /app
 RUN sh scripts/install.sh
