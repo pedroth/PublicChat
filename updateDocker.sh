@@ -1,5 +1,5 @@
 # This should be ran after everything is in git
-VERSION=v2.0.1
+VERSION=v2.0.0
 docker build -t pedroth/public-chat:latest -t pedroth/public-chat:$VERSION .
 docker push pedroth/public-chat:latest
 docker push pedroth/public-chat:$VERSION
