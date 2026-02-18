@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PublicChat</title>
     <!-- Font Awesome 6 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="all.min.css" rel="stylesheet">
     <link href="index.css" rel="stylesheet">
 </head>
 <body>
@@ -52,7 +52,11 @@
                 <button type="button" class="btn btn-primary" id="send">
                     <i class="fas fa-paper-plane"></i> Send
                 </button>
-                <button type="button" class="btn btn-outline" id="clear">
+                <button type="button" class="btn btn-outline" id="upload">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <input type="file" id="fileInput" style="display: none;">
+                <button type="button" class="btn btn-danger" id="clear">
                     <i class="fas fa-trash-alt"></i> Clear
                 </button>
             </div>
@@ -72,7 +76,7 @@
 </div>
 
 <!-- Only jQuery for basic compatibility -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="jquery.min.js"></script>
 <script type="text/javascript" src="index.js"></script>
 </body>
 </html>

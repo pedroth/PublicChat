@@ -358,6 +358,15 @@ class Upload {
 // init
 $("#clear").click(clearServer);
 $("#send").click(sendText);
+$("#upload").click(() => $("#fileInput").click());
+$("#fileInput").on("change", function() {
+    const file = this.files[0];
+    if (file) {
+        const upload = new Upload(file);
+        upload.doUpload();
+    }
+    $(this).val("");
+});
 $("#changeNameButton").click(() => { uID = $("#myIdIn").val(); });
 $("#myIdIn").val(uID);
 $("#burger").click(toggleNav);

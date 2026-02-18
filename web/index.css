@@ -177,6 +177,15 @@ textarea.form-control {
     background-color: var(--secondary-color);
 }
 
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+}
+
 /* Badge */
 .badge {
     display: inline-block;
