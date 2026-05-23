@@ -7,6 +7,7 @@ Public chat is a simple chat server that has the option to delete all data.
 ## Features
 - Send text messages through web
 - Upload files
+  - With previews of videos, sound and images 
 - Create links from url texts
 - Clear all data from server button
 
@@ -34,3 +35,7 @@ Follow the steps of [Dockerfile](/Dockerfile).
 A public instance of the public chat is [here](http://pedroth.duckdns.org).
 
 Most of the time is offline...
+
+## All versions from docker hub
+
+https://hub.docker.com/r/pedroth/public-chat/tags
